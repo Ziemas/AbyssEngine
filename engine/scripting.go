@@ -8,12 +8,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenDiablo2/AbyssEngine/node/label"
-
 	"github.com/OpenDiablo2/AbyssEngine/common"
 	"github.com/OpenDiablo2/AbyssEngine/loader/filesystemloader"
 	"github.com/OpenDiablo2/AbyssEngine/loader/mpqloader"
 	"github.com/OpenDiablo2/AbyssEngine/node"
+	"github.com/OpenDiablo2/AbyssEngine/node/button"
+	"github.com/OpenDiablo2/AbyssEngine/node/button/buttonlayout"
+	"github.com/OpenDiablo2/AbyssEngine/node/label"
 	"github.com/OpenDiablo2/AbyssEngine/node/sprite"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -23,6 +24,9 @@ import (
 var luaTypes = []common.LuaTypeExport{
 	node.LuaTypeExport,
 	sprite.LuaTypeExport,
+	label.LuaTypeExport,
+	button.LuaTypeExport,
+	buttonlayout.LuaTypeExport,
 }
 
 func registerType(l *lua.LState, luaTypeExport common.LuaTypeExport) {

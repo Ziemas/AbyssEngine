@@ -12,8 +12,58 @@ var LuaTypeExport = common.LuaTypeExport{
 	Name: luaTypeExportName,
 	//ConstructorFunc: newLuaEntity,
 	Methods: map[string]lua.LGFunction{
-		"node": luaGetNode,
+		"node":     luaGetNode,
+		"caption":  luaGetSetCaption,
+		"position": luaGetSetPosition,
 	},
+}
+
+func luaGetSetPosition(l *lua.LState) int {
+	label, err := FromLua(l.ToUserData(1))
+
+	if err != nil {
+		l.RaiseError("failed to convert")
+		return 0
+	}
+
+	if l.GetTop() == 1 {
+		l.Push(lua.LNumber(label.X))
+		l.Push(lua.LNumber(label.Y))
+		return 2
+	}
+
+	posX := l.ToNumber(2)
+	posY := l.ToNumber(3)
+
+	label.X = int(posX)
+	label.Y = int(posY)
+
+	return 0
+}
+
+func luaGetSetCaption(l *lua.LState) int {
+	label, err := FromLua(l.ToUserData(1))
+
+	if err != nil {
+		l.RaiseError("failed to convert")
+		return 0
+	}
+
+	if l.GetTop() == 1 {
+		l.Push(lua.LString(label.Caption))
+		return 1
+	}
+
+	newCaption := l.CheckString(2)
+
+	if label.Caption == newCaption {
+		return 0
+	}
+
+	label.Caption = newCaption
+	label.initialized = false
+
+	return 0
 }
 
 func luaGetNode(l *lua.LState) int {

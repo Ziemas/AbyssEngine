@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	mpq "github.com/OpenDiablo2/mpq/pkg"
+	"github.com/OpenDiablo2/mpq"
 )
 
 type MpqLoader struct {

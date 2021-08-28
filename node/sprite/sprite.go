@@ -85,7 +85,7 @@ func New(loaderProvider common.LoaderProvider, mousePosProvider common.MousePosi
 			return nil, err
 		}
 
-		result.Sequences = &common.DCCSequenceProvider{dccRes.Directions()}
+		result.Sequences = &common.DCCSequenceProvider{Sequences: dccRes.Directions()}
 
 	case ".dc6":
 		bytes, err := ioutil.ReadAll(fileStream)
@@ -126,9 +126,11 @@ func (s *Sprite) render() {
 		tex.Init = true
 	}
 
+	posX, posY := s.GetPosition()
+
 	rl.BeginShaderMode(common.PaletteShader)
 	rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
-	rl.DrawTexture(s.texture, int32(s.X), int32(s.Y), rl.White)
+	rl.DrawTexture(s.texture, int32(posX), int32(posY), rl.White)
 	rl.EndShaderMode()
 }
 
@@ -218,7 +220,7 @@ func (s *Sprite) initializeTexture() {
 				}
 			}
 
-			targetStartX += int(frameWidth)
+			targetStartX += frameWidth
 		}
 
 		targetStartX = 0
