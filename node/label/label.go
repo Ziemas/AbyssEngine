@@ -5,6 +5,7 @@ import (
 	"errors"
 	"image"
 	"io"
+	"strings"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 
@@ -13,6 +14,40 @@ import (
 	dc6 "github.com/OpenDiablo2/dc6/pkg"
 	tblfont "github.com/OpenDiablo2/tbl_font/pkg"
 )
+
+type LabelAlign int
+
+const (
+	LabelAlignStart LabelAlign = iota
+	LabelAlignCenter
+	LabelAlignEnd
+)
+
+func (l LabelAlign) ToString() string {
+	switch l {
+	case LabelAlignStart:
+		return "start"
+	case LabelAlignCenter:
+		return "center"
+	case LabelAlignEnd:
+		return "end"
+	}
+
+	return "start"
+}
+
+func StringToLabelAlign(s string) (LabelAlign, error) {
+	switch strings.ToLower(s) {
+	case "start":
+		return LabelAlignStart, nil
+	case "center":
+		return LabelAlignCenter, nil
+	case "end":
+		return LabelAlignEnd, nil
+	}
+
+	return LabelAlignStart, errors.New("unknown alignment value")
+}
 
 type Label struct {
 	*node.Node
@@ -24,12 +59,16 @@ type Label struct {
 	FontGfx     common.SequenceProvider
 	Palette     string
 	Caption     string
+	HAlign      LabelAlign
+	VAlign      LabelAlign
 }
 
 func New(loaderProvider common.LoaderProvider, fontPath, palette string) (*Label, error) {
 	result := &Label{
 		Node:        node.New(),
 		initialized: false,
+		HAlign:      LabelAlignStart,
+		VAlign:      LabelAlignStart,
 	}
 
 	_, ok := common.PaletteTexture[palette]
@@ -93,6 +132,20 @@ func (l *Label) render() {
 
 	posX, posY := l.GetPosition()
 
+	switch l.HAlign {
+	case LabelAlignCenter:
+		posX -= int(l.texture.Width / 2)
+	case LabelAlignEnd:
+		posX -= int(l.texture.Width)
+	}
+
+	switch l.VAlign {
+	case LabelAlignCenter:
+		posY -= int(l.texture.Height / 2)
+	case LabelAlignEnd:
+		posY -= int(l.texture.Height)
+	}
+
 	rl.BeginShaderMode(common.PaletteShader)
 	rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
 	rl.DrawTexture(l.texture, int32(posX), int32(posY), rl.White)
@@ -138,6 +191,10 @@ func (l *Label) initializeTexture() {
 		glyphOriginY := (l.FontGfx.FrameHeight(0, frameIdx) - glyphHeight) - 1
 
 		for y := 0; y < glyphHeight; y++ {
+			if y+glyphOriginY < 0 {
+				continue
+			}
+
 			for x := 0; x < glyphWidth; x++ {
 				c := l.FontGfx.GetColorIndexAt(0, frameIdx, x, y+glyphOriginY)
 				idx := (charOffsets[idx].X + x) + ((charOffsets[idx].Y + y) * width)

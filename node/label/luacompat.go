@@ -12,10 +12,45 @@ var LuaTypeExport = common.LuaTypeExport{
 	Name: luaTypeExportName,
 	//ConstructorFunc: newLuaEntity,
 	Methods: map[string]lua.LGFunction{
-		"node":     luaGetNode,
-		"caption":  luaGetSetCaption,
-		"position": luaGetSetPosition,
+		"node":      luaGetNode,
+		"caption":   luaGetSetCaption,
+		"position":  luaGetSetPosition,
+		"alignment": luaGetSetAlignment,
 	},
+}
+
+func luaGetSetAlignment(l *lua.LState) int {
+	label, err := FromLua(l.ToUserData(1))
+
+	if err != nil {
+		l.RaiseError("failed to convert")
+		return 0
+	}
+
+	if l.GetTop() == 1 {
+		l.Push(lua.LString(label.HAlign.ToString()))
+		l.Push(lua.LString(label.VAlign.ToString()))
+		return 2
+	}
+
+	hAlign, err := StringToLabelAlign(l.CheckString(2))
+
+	if err != nil {
+		l.ArgError(2, err.Error())
+		return 0
+	}
+
+	vAlign, err := StringToLabelAlign(l.CheckString(3))
+
+	if err != nil {
+		l.ArgError(3, err.Error())
+		return 0
+	}
+
+	label.HAlign = hAlign
+	label.VAlign = vAlign
+
+	return 0
 }
 
 func luaGetSetPosition(l *lua.LState) int {
