@@ -16,7 +16,28 @@ var LuaTypeExport = common.LuaTypeExport{
 		"caption":   luaGetSetCaption,
 		"position":  luaGetSetPosition,
 		"alignment": luaGetSetAlignment,
+		"color":     luaGetSetColor,
 	},
+}
+
+func luaGetSetColor(l *lua.LState) int {
+	label, err := FromLua(l.ToUserData(1))
+
+	if err != nil {
+		l.RaiseError("failed to convert")
+		return 0
+	}
+
+	if l.GetTop() == 1 {
+		l.Push(lua.LNumber(label.color))
+		return 1
+	}
+
+	color := l.ToNumber(2)
+
+	label.color = int(color)
+
+	return 0
 }
 
 func luaGetSetAlignment(l *lua.LState) int {

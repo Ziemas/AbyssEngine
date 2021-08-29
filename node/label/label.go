@@ -72,7 +72,7 @@ func New(loaderProvider common.LoaderProvider, fontPath, palette string) (*Label
 		HAlign:      LabelAlignStart,
 		VAlign:      LabelAlignStart,
 		BlendMode:   -1,
-		color:       5,
+		color:       0,
 	}
 
 	_, ok := common.PaletteTexture[palette]
