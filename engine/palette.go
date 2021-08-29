@@ -1,10 +1,11 @@
 package engine
 
 import (
+	"image/color"
 	"io/ioutil"
 
 	"github.com/OpenDiablo2/AbyssEngine/common"
-	datPalette "github.com/OpenDiablo2/dat_palette/pkg"
+	pl2 "github.com/OpenDiablo2/pl2/pkg"
 )
 
 func (e *Engine) loadPalette(name string, path string) error {
@@ -17,34 +18,29 @@ func (e *Engine) loadPalette(name string, path string) error {
 	if err != nil {
 		return err
 	}
+
 	paletteBytes, err := ioutil.ReadAll(paletteStream)
 
 	if err != nil {
 		return err
 	}
 
-	paletteData, err := datPalette.Decode(paletteBytes)
+	pal, err := pl2.FromBytes(paletteBytes)
 
 	if err != nil {
 		return err
 	}
 
-	colors := make([]byte, 256*4)
+	colors := make([]uint8, 0)
+	colors = append(colors, palToSlice(pal.BasePalette)...)
 
-	for i := 0; i < 256; i++ {
-		if i >= len(paletteData) {
-			break
-		}
+	common.PaletteTextShiftOffset = len(colors)/(256*4)
 
-		offset := i * 4
-		r, g, b, _ := paletteData[i].RGBA()
-		colors[offset] = uint8(r >> 8)
-		colors[offset+1] = uint8(g >> 8)
-		colors[offset+2] = uint8(b >> 8)
-		colors[offset+3] = 255
+	for idx := range pal.TextColorShifts {
+		colors = append(colors, transformToSlice(pal.BasePalette, pal.TextColorShifts[idx])...)
 	}
 
-	colors[3] = 0
+	common.PaletteTransformsCount = len(colors)/(256*4)
 
 	tex := &common.PalTex{}
 
@@ -54,4 +50,41 @@ func (e *Engine) loadPalette(name string, path string) error {
 	common.PaletteTexture[name] = tex
 
 	return nil
+}
+
+func transformToSlice(palette color.Palette, transform pl2.Transform) []uint8 {
+	colors := make([]uint8, 256*4)
+	for i := 0; i < 256; i++ {
+		offset := i * 4
+		r, g, b, _ := palette[transform[i]].RGBA()
+
+		colors[offset] = uint8(r >> 8)
+		colors[offset+1] = uint8(g >> 8)
+		colors[offset+2] = uint8(b >> 8)
+		colors[offset+3] = 255
+	}
+
+	colors[3] = 0
+
+	return colors
+}
+
+func palToSlice(color color.Palette) []uint8 {
+	colors := make([]uint8, 256*4)
+	for i := 0; i < 256; i++ {
+		if i >= len(color) {
+			break
+		}
+
+		offset := i * 4
+		r, g, b, _ := color[i].RGBA()
+		colors[offset] = uint8(r >> 8)
+		colors[offset+1] = uint8(g >> 8)
+		colors[offset+2] = uint8(b >> 8)
+		colors[offset+3] = 255
+	}
+
+	colors[3] = 0
+
+	return colors
 }

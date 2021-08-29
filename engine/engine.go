@@ -81,6 +81,7 @@ func New(config Configuration) *Engine {
 
 	common.PaletteShader = rl.LoadShaderFromMemory(media.StandardVertexShader, media.PaletteFragmentShader)
 	common.PaletteShaderLoc = rl.GetShaderLocation(common.PaletteShader, "palette")
+	common.PaletteShaderOffsetLoc = rl.GetShaderLocation(common.PaletteShader, "paletteOffset")
 	return result
 }
 
@@ -132,12 +133,10 @@ func (e *Engine) Run() {
 }
 
 func (e *Engine) showGame() {
-	rl.BeginShaderMode(common.PaletteShader)
 	e.rootNode.Render()
 	if e.cursorSprite != nil {
 		e.cursorSprite.Render()
 	}
-	rl.EndShaderMode()
 }
 
 func (e *Engine) updateGame(elapsed float64) {
