@@ -10,10 +10,11 @@ in vec4 fragColor;
 // Init uniform values
 uniform sampler2D texture0;
 uniform sampler2D palette;
+uniform float paletteOffset;
 
 out vec4 finalColor;
 
 void main() {
   vec4 index = texture(texture0, fragTexCoord);
-  finalColor = texture(palette, index.xy);
+  finalColor = texture(palette, vec2(index.x, paletteOffset));
 }

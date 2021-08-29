@@ -38,6 +38,7 @@ type Sprite struct {
 	playLoop          bool
 	bottomOrigin      bool
 	blendMode         blendMode
+	paletteShift      int
 	onMouseButtonDown func()
 	onMouseButtonUp   func()
 	onMouseOver       func()
