@@ -103,7 +103,7 @@ func (e *Engine) bootstrapScripts() {
 
 				// loadString(path: string)
 				// loads a string from the loader
-				"loadString": func(l *lua.LState) int { return e.luaExitBootMode(l) },
+				"loadString": func(l *lua.LState) int { return e.luaLoadString(l) },
 
 				// splitString(source: string, splitChars: string)
 				// splits a string by the specified split characters
@@ -128,6 +128,8 @@ func (e *Engine) bootstrapScripts() {
 				// loadPalette(name: string, filePath: string)
 				// loads palette for use with sprites
 				"loadPalette": func(l *lua.LState) int { return e.luaLoadPalette(l) },
+
+				"loadButton": func(l *lua.LState) int { return e.luaLoadButton(l) },
 			})
 
 			e.luaState.Push(mod)
@@ -149,7 +151,7 @@ func (e *Engine) luaLoader(l *lua.LState) int {
 	toLoad := l.CheckString(1)
 
 	if len(toLoad) == 0 {
-		l.Push(lua.LString(fmt.Sprintf("no resource name specified", toLoad)))
+		l.Push(lua.LString(fmt.Sprintf("no resource name specified: %s", toLoad)))
 		return 1
 	}
 
@@ -391,6 +393,30 @@ func (e *Engine) luaGetRootNode(l *lua.LState) int {
 	}
 
 	l.Push(e.rootNode.ToLua(l))
+	return 1
+}
+
+func (e *Engine) luaLoadButton(l *lua.LState) int {
+	buttonLayout, err := buttonlayout.FromLua(l.ToUserData(1))
+
+	if err != nil {
+		l.ArgError(1, "button layout expected")
+		return 0
+	}
+
+	button, err := button.New(e.loader, e, *buttonLayout)
+
+	if err != nil {
+		l.RaiseError(err.Error())
+		return 0
+	}
+
+	if l.GetTop() == 2 {
+		text := l.ToString(2)
+		button.SetText(text)
+	}
+
+	l.Push(button.ToLua(l))
 	return 1
 }
 

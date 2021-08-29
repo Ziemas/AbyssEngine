@@ -9,15 +9,18 @@ import (
 
 	"github.com/OpenDiablo2/AbyssEngine/engine"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/pkg/profile"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
 )
 
 var runPath string
+var doProfile bool
 
 func initFlags() {
 	flag.StringVar(&runPath, "path", "", "path to the engine runtime files")
+	flag.BoolVar(&doProfile, "profile", false, "profile the engine")
 	flag.Parse()
 
 	if runPath == "" {
@@ -33,6 +36,10 @@ func initLogging() {
 func main() {
 	initFlags()
 	initLogging()
+
+	if doProfile {
+		defer profile.Start(profile.ProfilePath(".")).Stop()
+	}
 
 	log.Info().Msg("Abyss Engine")
 	log.Debug().Msgf("Runtime Path: %s", runPath)

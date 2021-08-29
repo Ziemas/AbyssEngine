@@ -2,7 +2,6 @@ package button
 
 import (
 	"github.com/OpenDiablo2/AbyssEngine/common"
-	"github.com/OpenDiablo2/AbyssEngine/loader"
 	"github.com/OpenDiablo2/AbyssEngine/node"
 	"github.com/OpenDiablo2/AbyssEngine/node/button/buttonlayout"
 	"github.com/OpenDiablo2/AbyssEngine/node/sprite"
@@ -23,11 +22,13 @@ type Button struct {
 	toggled      bool
 	onClick      func()
 	sprite       *sprite.Sprite
+	text         string
 }
 
-func New(loaderProvider loader.LoaderProvider, mousePositionProvider common.MousePositionProvider,
+func New(loaderProvider common.LoaderProvider, mousePositionProvider common.MousePositionProvider,
 	buttonLayout buttonlayout.ButtonLayout) (*Button, error) {
 	result := &Button{
+		Node:         node.New(),
 		buttonLayout: buttonLayout,
 		enabled:      true,
 		pressed:      false,
@@ -55,6 +56,14 @@ func New(loaderProvider loader.LoaderProvider, mousePositionProvider common.Mous
 	}
 
 	return result, nil
+}
+
+func (b *Button) SetText(newText string) {
+	if b.text == newText {
+		return
+	}
+
+	b.text = newText
 }
 
 func (b *Button) render() {

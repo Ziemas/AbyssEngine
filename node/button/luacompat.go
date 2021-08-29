@@ -7,11 +7,13 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
-var luaTypeExportName = "buttonlayout"
+var luaTypeExportName = "button"
 var LuaTypeExport = common.LuaTypeExport{
 	Name: luaTypeExportName,
 	//ConstructorFunc: newLuaEntity,
-	Methods: map[string]lua.LGFunction{},
+	Methods: map[string]lua.LGFunction{
+		"node": luaGetNode,
+	},
 }
 
 func (b *Button) ToLua(ls *lua.LState) *lua.LUserData {
@@ -31,4 +33,17 @@ func FromLua(ud *lua.LUserData) (*Button, error) {
 	}
 
 	return v, nil
+}
+
+func luaGetNode(l *lua.LState) int {
+	button, err := FromLua(l.ToUserData(1))
+
+	if err != nil {
+		l.RaiseError("failed to convert")
+		return 0
+	}
+
+	l.Push(button.Node.ToLua(l))
+
+	return 1
 }

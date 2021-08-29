@@ -13,6 +13,7 @@ var LuaTypeExport = common.LuaTypeExport{
 	//ConstructorFunc: newLuaEntity,
 	Methods: map[string]lua.LGFunction{
 		"appendChild": luaAppendChild,
+		"removeChild": luaRemoveChild,
 	},
 }
 
@@ -33,6 +34,31 @@ func FromLua(ud *lua.LUserData) (*Node, error) {
 	}
 
 	return v, nil
+}
+
+func luaRemoveChild(l *lua.LState) int {
+	if l.GetTop() != 2 {
+		l.ArgError(1, "argument expected")
+		return 0
+	}
+
+	self, ok := l.ToUserData(1).Value.(*Node)
+
+	if !ok {
+		l.RaiseError("failed to convert")
+		return 0
+	}
+
+	child, ok := l.ToUserData(2).Value.(*Node)
+
+	if !ok {
+		l.RaiseError("failed to convert")
+		return 0
+	}
+
+	self.RemoveChild(child)
+
+	return 0
 }
 
 func luaAppendChild(l *lua.LState) int {
