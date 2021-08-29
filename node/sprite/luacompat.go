@@ -3,8 +3,6 @@ package sprite
 import (
 	"fmt"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
-
 	"github.com/OpenDiablo2/AbyssEngine/common"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -28,7 +26,47 @@ var LuaTypeExport = common.LuaTypeExport{
 		"mouseButtonUpHandler":   luaGetSetMouseButtonUpHandler,
 		"mouseOverHandler":       luaGetSetMouseOverHandler,
 		"mouseLeaveHandler":      luaGetSetMouseLeaveHandler,
+		"playForward":            luaGetPlayForward,
+		"blendMode":              luaGetSetBlendMode,
 	},
+}
+
+func luaGetSetBlendMode(l *lua.LState) int {
+	sprite, err := FromLua(l.ToUserData(1))
+
+	if err != nil {
+		l.RaiseError("failed to convert")
+		return 0
+	}
+
+	if l.GetTop() == 1 {
+		l.Push(lua.LString(blendModeToString(sprite.blendMode)))
+		return 1
+	}
+
+	newMode, err := stringToBlendMode(l.CheckString(2))
+
+	if err != nil {
+		l.RaiseError(err.Error())
+		return 0
+	}
+
+	sprite.blendMode = newMode
+
+	return 0
+}
+
+func luaGetPlayForward(l *lua.LState) int {
+	sprite, err := FromLua(l.ToUserData(1))
+
+	if err != nil {
+		l.RaiseError("failed to convert")
+		return 0
+	}
+
+	sprite.PlayForward()
+
+	return 0
 }
 
 func luaGetSetMouseOverHandler(l *lua.LState) int {
@@ -145,7 +183,7 @@ func luaGetFrameCount(l *lua.LState) int {
 		return 0
 	}
 
-	l.Push(lua.LNumber(sprite.Sequences.FrameCount(sprite.CurrentSequence)))
+	l.Push(lua.LNumber(sprite.Sequences.FrameCount(sprite.CurrentSequence())))
 	return 1
 }
 
@@ -176,13 +214,12 @@ func luaGetSetCurrentFrame(l *lua.LState) int {
 
 	newFrame := l.CheckInt(2)
 
-	if (newFrame < 0) || (newFrame >= sprite.Sequences.FrameCount(sprite.CurrentSequence)) {
+	if (newFrame < 0) || (newFrame >= sprite.Sequences.FrameCount(sprite.CurrentSequence())) {
 		l.RaiseError("frame index out of bounds")
 		return 0
 	}
 
 	sprite.CurrentFrame = newFrame
-	sprite.initialized = false
 
 	return 0
 }
@@ -196,7 +233,7 @@ func luaGetSetCurrentSequence(l *lua.LState) int {
 	}
 
 	if l.GetTop() == 1 {
-		l.Push(lua.LNumber(sprite.CurrentSequence))
+		l.Push(lua.LNumber(sprite.CurrentSequence()))
 		return 1
 	}
 
@@ -207,9 +244,8 @@ func luaGetSetCurrentSequence(l *lua.LState) int {
 		return 0
 	}
 
-	sprite.CurrentSequence = newSequence
+	sprite.SetSequence(newSequence)
 	sprite.CurrentFrame = 0
-	sprite.initialized = false
 
 	return 0
 }
@@ -288,8 +324,6 @@ func luaGetSetCellSize(l *lua.LState) int {
 
 	sprite.CellSizeX = int(sizeX)
 	sprite.CellSizeY = int(sizeY)
-	sprite.initialized = false
-	rl.UnloadTexture(sprite.texture)
 
 	return 0
 }

@@ -34,8 +34,8 @@ func New(loaderProvider loader.LoaderProvider, mousePositionProvider common.Mous
 		toggled:      false,
 	}
 
-	result.RenderCallback = func() { result.render() }
-	result.UpdateCallback = func() { result.update() }
+	result.RenderCallback = result.render
+	result.UpdateCallback = result.update
 
 	var err error
 
@@ -81,6 +81,6 @@ func (b *Button) render() {
 	}
 }
 
-func (b *Button) update() {
+func (b *Button) update(elapsed float64) {
 
 }

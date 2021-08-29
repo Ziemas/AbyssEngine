@@ -8,6 +8,22 @@ type DCCSequenceProvider struct {
 	Sequences []*dcc.Direction
 }
 
+func (d *DCCSequenceProvider) GetFrameOffsetX(sequenceId, frameId int) int {
+	if sequenceId < 0 || sequenceId >= len(d.Sequences) {
+		return 0
+	}
+
+	return d.Sequences[sequenceId].Frame(frameId).XOffset
+}
+
+func (d *DCCSequenceProvider) GetFrameOffsetY(sequenceId, frameId int) int {
+	if sequenceId < 0 || sequenceId >= len(d.Sequences) {
+		return 0
+	}
+
+	return d.Sequences[sequenceId].Frame(frameId).YOffset
+}
+
 func (d *DCCSequenceProvider) SequenceCount() int {
 	return len(d.Sequences)
 }

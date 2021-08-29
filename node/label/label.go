@@ -153,7 +153,7 @@ func (l *Label) render() {
 
 }
 
-func (l *Label) update() {
+func (l *Label) update(elapsed float64) {
 	if !l.initialized && len(l.Caption) > 0 {
 		l.initialized = true
 		l.initializeTexture()

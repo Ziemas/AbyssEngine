@@ -18,7 +18,7 @@ type Node struct {
 	X              int
 	Y              int
 	RenderCallback func()
-	UpdateCallback func()
+	UpdateCallback func(elapsed float64)
 }
 
 func New() *Node {
@@ -125,13 +125,13 @@ func (e *Node) Render() {
 	}
 }
 
-func (e *Node) Update() {
+func (e *Node) Update(elapsed float64) {
 	if !e.Active {
 		return
 	}
 
 	if e.UpdateCallback != nil {
-		e.UpdateCallback()
+		e.UpdateCallback(elapsed)
 	}
 
 	toRemove := make([]*Node, 0)
@@ -144,7 +144,7 @@ func (e *Node) Update() {
 			continue
 		}
 
-		e.Children[idx].Update()
+		e.Children[idx].Update(elapsed)
 
 		if e.Children[idx].ShouldRemove {
 			toRemove = append(toRemove, e.Children[idx])

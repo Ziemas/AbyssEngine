@@ -53,3 +53,19 @@ func (d *DC6SequenceProvider) GetColorIndexAt(sequenceId, frameId, x, y int) uin
 
 	return d.Sequences[sequenceId].Frames[frameId].ColorIndexAt(x, y)
 }
+
+func (d *DC6SequenceProvider) GetFrameOffsetX(sequenceId, frameId int) int {
+	if sequenceId < 0 || sequenceId >= len(d.Sequences) {
+		return 0
+	}
+
+	return int(d.Sequences[sequenceId].Frames[frameId].OffsetX)
+}
+
+func (d *DC6SequenceProvider) GetFrameOffsetY(sequenceId, frameId int) int {
+	if sequenceId < 0 || sequenceId >= len(d.Sequences) {
+		return 0
+	}
+
+	return int(d.Sequences[sequenceId].Frames[frameId].OffsetY)
+}

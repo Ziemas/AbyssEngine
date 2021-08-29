@@ -2,7 +2,6 @@ package engine
 
 import (
 	"fmt"
-	"io/ioutil"
 	"math"
 	"runtime"
 
@@ -14,7 +13,6 @@ import (
 	"github.com/OpenDiablo2/AbyssEngine/media"
 	"github.com/OpenDiablo2/AbyssEngine/node"
 	"github.com/OpenDiablo2/AbyssEngine/node/sprite"
-	datPalette "github.com/OpenDiablo2/dat_palette/pkg"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/rs/zerolog/log"
 )
@@ -110,7 +108,7 @@ func (e *Engine) Run() {
 		e.drawMainSurface()
 
 		if e.engineMode == EngineModeGame {
-			e.updateGame()
+			e.updateGame(float64(rl.GetFrameTime()))
 		}
 	}
 
@@ -125,8 +123,8 @@ func (e *Engine) showGame() {
 	}
 }
 
-func (e *Engine) updateGame() {
-	e.rootNode.Update()
+func (e *Engine) updateGame(elapsed float64) {
+	e.rootNode.Update(elapsed)
 	if e.cursorSprite != nil {
 		scale := float32(math.Min(float64(rl.GetScreenWidth())/800.0, float64(rl.GetScreenHeight())/600.0))
 		xOrigin := (float32(rl.GetScreenWidth()) - (800.0 * scale)) * 0.5
@@ -138,7 +136,7 @@ func (e *Engine) updateGame() {
 		e.cursorY = int((float32(rl.GetMouseY()) - yOrigin) * (1.0 / scale))
 		e.cursorSprite.Y = e.cursorY
 
-		e.cursorSprite.Update()
+		e.cursorSprite.Update(elapsed)
 	}
 }
 
@@ -174,58 +172,9 @@ func (e *Engine) drawMainSurface() {
 
 	rl.DrawTextEx(e.systemFont, fmt.Sprintf("FPS: %d", int(rl.GetFPS())), rl.Vector2{X: 5, Y: 5}, 18, 0, rl.White)
 	rl.DrawTextEx(e.systemFont, fmt.Sprintf("GC: %d (%%%d)", int(memStats.NumGC), int(memStats.GCCPUFraction*100)), rl.Vector2{X: 5, Y: 21}, 18, 0, rl.White)
-	rl.DrawTextEx(e.systemFont, fmt.Sprintf("Alloc: %d/%d - %0.2fMB", int(memStats.Alloc/1024/1024), int(memStats.TotalAlloc/1024/1024), float32(memStats.Sys/1024/1024)), rl.Vector2{X: 5, Y: 37}, 18, 0, rl.White)
+	rl.DrawTextEx(e.systemFont, fmt.Sprintf("Alloc: %0.2fMB (%0.2fMB)", float32(memStats.Alloc)/1024/1024, float32(memStats.Sys)/1024/1024), rl.Vector2{X: 5, Y: 37}, 18, 0, rl.White)
 
 	rl.EndDrawing()
-}
-
-func (e *Engine) loadPalette(name string, path string) error {
-	if common.PaletteTexture == nil {
-		common.PaletteTexture = make(map[string]*common.PalTex)
-	}
-
-	paletteStream, err := e.loader.Load(path)
-
-	if err != nil {
-		return err
-	}
-	paletteBytes, err := ioutil.ReadAll(paletteStream)
-
-	if err != nil {
-		return err
-	}
-
-	paletteData, err := datPalette.Decode(paletteBytes)
-
-	if err != nil {
-		return err
-	}
-
-	colors := make([]byte, 256*4)
-
-	for i := 0; i < 256; i++ {
-		if i >= len(paletteData) {
-			break
-		}
-
-		offset := i * 4
-		r, g, b, _ := paletteData[i].RGBA()
-		colors[offset] = uint8(r >> 8)
-		colors[offset+1] = uint8(g >> 8)
-		colors[offset+2] = uint8(b >> 8)
-		colors[offset+3] = 255
-	}
-
-	colors[3] = 0
-
-	tex := &common.PalTex{}
-
-	tex.Data = colors
-	tex.Init = false
-
-	common.PaletteTexture[name] = tex
-
-	return nil
 }
 
 func (e *Engine) panic(msg string) {
