@@ -153,11 +153,11 @@ func (l *Label) render() {
 	if l.BlendMode > -1 {
 		rl.BeginBlendMode(l.BlendMode)
 	}
-	//rl.BeginShaderMode(common.PaletteShader)
+	rl.BeginShaderMode(common.PaletteShader)
 	rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
 	rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(l.color+common.PaletteTextShiftOffset) / float32(common.PaletteTransformsCount-1)}, rl.ShaderUniformFloat)
 	rl.DrawTexture(l.texture, int32(posX), int32(posY), rl.White)
-	//rl.EndShaderMode()
+	rl.EndShaderMode()
 	if l.BlendMode > -1 {
 		rl.EndBlendMode()
 	}

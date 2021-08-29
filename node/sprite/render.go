@@ -89,7 +89,7 @@ func (s *Sprite) render() {
 
 	posY += s.Sequences.FrameOffsetY(s.CurrentSequence(), s.CurrentFrame)
 
-	// rl.BeginShaderMode(common.PaletteShader)
+	rl.BeginShaderMode(common.PaletteShader)
 	rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
 
 	rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(s.paletteShift)}, rl.ShaderUniformFloat)
@@ -104,7 +104,7 @@ func (s *Sprite) render() {
 		rl.EndBlendMode()
 	}
 
-	// rl.EndShaderMode()
+	rl.EndShaderMode()
 }
 
 func (s *Sprite) initializeTexture() {

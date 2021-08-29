@@ -133,12 +133,10 @@ func (e *Engine) Run() {
 }
 
 func (e *Engine) showGame() {
-	rl.BeginShaderMode(common.PaletteShader)
 	e.rootNode.Render()
 	if e.cursorSprite != nil {
 		e.cursorSprite.Render()
 	}
-	rl.EndShaderMode()
 }
 
 func (e *Engine) updateGame(elapsed float64) {
