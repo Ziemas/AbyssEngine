@@ -59,6 +59,7 @@ type Label struct {
 	FontGfx     common.SequenceProvider
 	Palette     string
 	Caption     string
+	color       int
 	HAlign      LabelAlign
 	VAlign      LabelAlign
 }
@@ -69,6 +70,7 @@ func New(loaderProvider common.LoaderProvider, fontPath, palette string) (*Label
 		initialized: false,
 		HAlign:      LabelAlignStart,
 		VAlign:      LabelAlignStart,
+		color:       5,
 	}
 
 	_, ok := common.PaletteTexture[palette]
@@ -124,7 +126,7 @@ func (l *Label) render() {
 
 	tex := common.PaletteTexture[l.Palette]
 	if !tex.Init {
-		img := rl.NewImage(tex.Data, 256, 1, 1, rl.UncompressedR8g8b8a8)
+		img := rl.NewImage(tex.Data, 256, int32(common.PaletteTransformsCount), 1, rl.UncompressedR8g8b8a8)
 		tex.Texture = rl.LoadTextureFromImage(img)
 
 		tex.Init = true
@@ -148,6 +150,7 @@ func (l *Label) render() {
 
 	rl.BeginShaderMode(common.PaletteShader)
 	rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
+	rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(l.color+common.PaletteTextShiftOffset) / float32(common.PaletteTransformsCount-1)}, rl.ShaderUniformFloat)
 	rl.DrawTexture(l.texture, int32(posX), int32(posY), rl.White)
 	rl.EndShaderMode()
 

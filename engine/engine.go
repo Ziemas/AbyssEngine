@@ -76,6 +76,7 @@ func New(config Configuration) *Engine {
 
 	common.PaletteShader = rl.LoadShaderFromMemory(media.StandardVertexShader, media.PaletteFragmentShader)
 	common.PaletteShaderLoc = rl.GetShaderLocation(common.PaletteShader, "palette")
+	common.PaletteShaderOffsetLoc = rl.GetShaderLocation(common.PaletteShader, "paletteOffset")
 	return result
 }
 
