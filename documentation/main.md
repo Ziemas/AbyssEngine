@@ -15,4 +15,4 @@ Mods can utilize the original MPQ file archives seen in Diablo 2 games, as well 
 
 ## Mod Development
 
-* [Bootstrapping](mod-bootstrap)
+* [Bootstrapping](bootstrapping.md)

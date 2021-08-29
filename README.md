@@ -24,7 +24,7 @@ ALL OTHER TRADEMARKS ARE THE PROPERTY OF THEIR RESPECTIVE OWNERS.
 
 ## Documentation
 
-* [Main Documentation](documentation/bootstrapping.md)
+* [Main Documentation](documentation/main.md)
 
 ## Additional Credits
 
