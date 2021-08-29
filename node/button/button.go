@@ -67,6 +67,9 @@ func (b *Button) SetText(newText string) {
 }
 
 func (b *Button) render() {
+	if !b.Visible || !b.Active {
+		return
+	}
 
 	if b.buttonLayout.HasImage {
 
@@ -91,5 +94,9 @@ func (b *Button) render() {
 }
 
 func (b *Button) update(elapsed float64) {
+	if !b.Active {
+		return
+	}
 
+	b.sprite.Update(elapsed)
 }

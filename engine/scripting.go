@@ -518,8 +518,8 @@ func (e *Engine) luaLoadPalette(l *lua.LState) int {
 }
 
 func (e *Engine) luaLoadLabel(l *lua.LState) int {
-	if l.GetTop() != 2 {
-		l.ArgError(l.GetTop(), "expected two arguments")
+	if l.GetTop() < 2 {
+		l.ArgError(l.GetTop(), "expected at leaset two arguments")
 		return 0
 	}
 
@@ -531,6 +531,10 @@ func (e *Engine) luaLoadLabel(l *lua.LState) int {
 	if err != nil {
 		l.RaiseError(err.Error())
 		return 0
+	}
+
+	if l.GetTop() == 3 {
+		result.Caption = l.CheckString(3)
 	}
 
 	l.Push(result.ToLua(l))

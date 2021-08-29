@@ -9,12 +9,22 @@ import (
 
 var luaTypeExportName = "node"
 var LuaTypeExport = common.LuaTypeExport{
-	Name: luaTypeExportName,
-	//ConstructorFunc: newLuaEntity,
+	Name:            luaTypeExportName,
+	ConstructorFunc: luaNewNode,
 	Methods: map[string]lua.LGFunction{
 		"appendChild": luaAppendChild,
 		"removeChild": luaRemoveChild,
 	},
+}
+
+func luaNewNode(l *lua.LState) int {
+	result := New()
+	userData := l.NewUserData()
+	userData.Value = result
+
+	l.SetMetatable(userData, l.GetTypeMetatable(luaTypeExportName))
+	l.Push(userData)
+	return 1
 }
 
 func (e *Node) ToLua(l *lua.LState) *lua.LUserData {
