@@ -4,7 +4,6 @@ go 1.17
 
 require (
 	github.com/OpenDiablo2/OpenDiablo2 v0.0.0-20210514222603-a688d660a0f7
-	github.com/OpenDiablo2/dat_palette v0.0.0-20210818232957-8351eac88246
 	github.com/OpenDiablo2/dc6 v0.0.0-20210821230447-aaf0d5ae63c7
 	github.com/OpenDiablo2/dcc v0.0.0-20210819170315-16ddc7029d0b
 	github.com/OpenDiablo2/mpq v0.0.0-20210821202548-ec71ed9a0c2d
@@ -22,9 +21,6 @@ require (
 	github.com/pkg/profile v1.6.0
 )
 
-require (
-	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
-	github.com/google/pprof v0.0.0-20210827144239-02619b876842 // indirect
-	github.com/ianlancetaylor/demangle v0.0.0-20210822211355-471757278659 // indirect
-	golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4 // indirect
-)
+require github.com/OpenDiablo2/pl2 v0.0.0-20210829065851-466620ae9e98
+
+require github.com/lucasb-eyer/go-colorful v1.2.0 // indirect

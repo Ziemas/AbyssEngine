@@ -19,6 +19,8 @@ github.com/OpenDiablo2/dcc v0.0.0-20210819170315-16ddc7029d0b h1:IGOxsgC2vwfaERG
 github.com/OpenDiablo2/dcc v0.0.0-20210819170315-16ddc7029d0b/go.mod h1:/2FXuM7tCBp3TwxHRwmeOSVRtN9lykVsVbEephR+HVo=
 github.com/OpenDiablo2/mpq v0.0.0-20210821202548-ec71ed9a0c2d h1:X/aiw+MjQLQqxgg26LH0Y/DjJqiKQXCI6B0dL0hsCLY=
 github.com/OpenDiablo2/mpq v0.0.0-20210821202548-ec71ed9a0c2d/go.mod h1:n4Ln4c+J7U+PSIdmnFraimt0KopM3/W7Mic/mmh6zNM=
+github.com/OpenDiablo2/pl2 v0.0.0-20210829065851-466620ae9e98 h1:oQkqU22qL/iTANvF+JUelwfsMvgx1ULbD6ggAV/CZRk=
+github.com/OpenDiablo2/pl2 v0.0.0-20210829065851-466620ae9e98/go.mod h1:nFLx912zqfMzBfvrFl6hdVcpyBaJUwqi6y8dESqwcjE=
 github.com/OpenDiablo2/tbl_font v0.0.0-20210828043410-4143638af70e h1:1oXyoBUaQZskhBNPYFFyd78RsKbOP9pNP7P+pJ7c68k=
 github.com/OpenDiablo2/tbl_font v0.0.0-20210828043410-4143638af70e/go.mod h1:NTyv4p8pthE5erfuVjAJtoDzboczxFB7oGTawEIANyM=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
@@ -50,6 +52,7 @@ github.com/google/pprof v0.0.0-20210827144239-02619b876842/go.mod h1:kpwsk12EmLe
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/gravestench/akara v0.0.0-20201014060234-a64208a7fd3c/go.mod h1:fTeda1SogMg5Lkd4lXMEd/Pk/a5/gQuLGaAI2rn1PBQ=
 github.com/gravestench/gpl v0.0.0-20210613190341-3dd16317a222/go.mod h1:1s4i4jzOTXxRqXjSIHgiARwwnG6sJyGX49MVBV2AurQ=
+github.com/gravestench/gpl v0.0.0-20210615232229-779e263cf91e/go.mod h1:1s4i4jzOTXxRqXjSIHgiARwwnG6sJyGX49MVBV2AurQ=
 github.com/gravestench/gpl v0.0.0-20210624060123-667359aa05ca/go.mod h1:1s4i4jzOTXxRqXjSIHgiARwwnG6sJyGX49MVBV2AurQ=
 github.com/hajimehoshi/bitmapfont/v2 v2.1.0/go.mod h1:2BnYrkTQGThpr/CY6LorYtt/zEPNzvE/ND69CRTaHMs=
 github.com/hajimehoshi/ebiten/v2 v2.0.2/go.mod h1:AbHP/SS226aFTex/izULVwW0D2AuGyqC4AVwilmRjOg=
@@ -67,6 +70,8 @@ github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=
+github.com/lucasb-eyer/go-colorful v1.2.0 h1:1nnpGOrhyZZuNyfu1QjKiUICQ74+3FNCN69Aj6K7nkY=
+github.com/lucasb-eyer/go-colorful v1.2.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4/go.mod h1:4OwLy04Bl9Ef3GJJCoec+30X3LQs/0/m4HFRt/2LUSA=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
