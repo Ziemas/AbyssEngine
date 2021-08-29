@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"image"
 	"math"
 	"runtime"
 
@@ -19,19 +20,22 @@ import (
 
 // Engine represents the main game engine
 type Engine struct {
-	config        Configuration
-	loader        *loader.Loader
-	renderSurface rl.RenderTexture2D
-	systemFont    rl.Font
-	bootLogo      rl.Texture2D
-	bootLoadText  string
-	shutdown      bool
-	engineMode    EngineMode
-	cursorSprite  *sprite.Sprite
-	rootNode      *node.Node
-	cursorX       int
-	cursorY       int
-	luaState      *lua.LState
+	config           Configuration
+	loader           *loader.Loader
+	renderSurface    rl.RenderTexture2D
+	systemFont       rl.Font
+	bootLogo         rl.Texture2D
+	bootLoadText     string
+	shutdown         bool
+	engineMode       EngineMode
+	cursorSprite     *sprite.Sprite
+	rootNode         *node.Node
+	cursorX          int
+	cursorY          int
+	toggleFullscreen bool
+	isFullscreen     bool
+	cursorOffset     image.Point
+	luaState         *lua.LState
 }
 
 func (e *Engine) GetMousePosition() (X, Y int) {
@@ -50,18 +54,19 @@ func (e *Engine) GetLanguageFontCode() string {
 
 // New creates a new instance of the engine
 func New(config Configuration) *Engine {
-	rl.SetConfigFlags(rl.FlagWindowResizable | rl.FlagVsyncHint)
+	rl.SetConfigFlags(rl.FlagWindowResizable)
 	rl.InitWindow(800, 600, "Abyss Engine")
-	rl.SetTargetFPS(60)
-	rl.HideCursor()
-
+	rl.SetWindowMinSize(800, 600)
 	result := &Engine{
-		shutdown:      false,
-		config:        config,
-		engineMode:    EngineModeBoot,
-		renderSurface: rl.LoadRenderTexture(800, 600),
-		systemFont:    rl.LoadFontFromMemory(".ttf", media.FontDiabloHeavy, int32(len(media.FontDiabloHeavy)), 18, nil, 0),
-		rootNode:      node.New(),
+		shutdown:         false,
+		toggleFullscreen: false,
+		isFullscreen:     false,
+		config:           config,
+		engineMode:       EngineModeBoot,
+		renderSurface:    rl.LoadRenderTexture(800, 600),
+		systemFont:       rl.LoadFontFromMemory(".ttf", media.FontDiabloHeavy, int32(len(media.FontDiabloHeavy)), 18, nil, 0),
+		rootNode:         node.New(),
+		cursorOffset:     image.Point{},
 	}
 
 	result.loader = loader.New(result)
@@ -110,6 +115,16 @@ func (e *Engine) Run() {
 		if e.engineMode == EngineModeGame {
 			e.updateGame(float64(rl.GetFrameTime()))
 		}
+
+		if e.toggleFullscreen {
+			e.toggleFullscreen = false
+			if e.isFullscreen {
+				rl.ClearWindowState(rl.FlagFullscreenMode)
+			} else {
+				rl.SetWindowState(rl.FlagFullscreenMode)
+			}
+			e.isFullscreen = !e.isFullscreen
+		}
 	}
 
 	e.luaState.Close()
@@ -117,10 +132,12 @@ func (e *Engine) Run() {
 }
 
 func (e *Engine) showGame() {
+	rl.BeginShaderMode(common.PaletteShader)
 	e.rootNode.Render()
 	if e.cursorSprite != nil {
 		e.cursorSprite.Render()
 	}
+	rl.EndShaderMode()
 }
 
 func (e *Engine) updateGame(elapsed float64) {
@@ -131,10 +148,10 @@ func (e *Engine) updateGame(elapsed float64) {
 		yOrigin := (float32(rl.GetScreenHeight()) - (600.0 * scale)) * 0.5
 
 		e.cursorX = int((float32(rl.GetMouseX()) - xOrigin) * (1.0 / scale))
-		e.cursorSprite.X = e.cursorX
+		e.cursorSprite.X = e.cursorX + e.cursorOffset.X
 
 		e.cursorY = int((float32(rl.GetMouseY()) - yOrigin) * (1.0 / scale))
-		e.cursorSprite.Y = e.cursorY
+		e.cursorSprite.Y = e.cursorY + e.cursorOffset.Y
 
 		e.cursorSprite.Update(elapsed)
 	}

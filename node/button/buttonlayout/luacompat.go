@@ -2,8 +2,6 @@ package buttonlayout
 
 import (
 	"fmt"
-	"image"
-
 	"github.com/OpenDiablo2/AbyssEngine/common"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -16,7 +14,6 @@ var LuaTypeExport = common.LuaTypeExport{
 		"resourceName":     luaGetSetResourceName,
 		"paletteName":      luaGetSetPaletteName,
 		"fontPath":         luaGetSetFontPath,
-		"clickableRect":    luaGetSetClickableRect,
 		"xSegments":        luaGetSetXSegments,
 		"ySegments":        luaGetSetYSegments,
 		"baseFrame":        luaGetSetBaseFrame,
@@ -91,41 +88,6 @@ func luaGetSetFontPath(l *lua.LState) int {
 	newValue := l.CheckString(2)
 
 	buttonLayout.FontPath = newValue
-
-	return 0
-}
-
-func luaGetSetClickableRect(l *lua.LState) int {
-	buttonLayout, err := FromLua(l.ToUserData(1))
-
-	if err != nil {
-		l.RaiseError("failed to convert")
-		return 0
-	}
-
-	if l.GetTop() == 1 {
-		l.Push(lua.LNumber(buttonLayout.ClickableRect.Min.X))
-		l.Push(lua.LNumber(buttonLayout.ClickableRect.Min.Y))
-		l.Push(lua.LNumber(buttonLayout.ClickableRect.Max.X))
-		l.Push(lua.LNumber(buttonLayout.ClickableRect.Max.Y))
-		return 4
-	}
-
-	x1 := l.CheckInt(2)
-	y1 := l.CheckInt(3)
-	x2 := l.CheckInt(4)
-	y2 := l.CheckInt(5)
-
-	buttonLayout.ClickableRect = &image.Rectangle{
-		Min: image.Point{
-			X: x1,
-			Y: y1,
-		},
-		Max: image.Point{
-			X: x2,
-			Y: y2,
-		},
-	}
 
 	return 0
 }
@@ -239,13 +201,16 @@ func luaGetSetTextOffset(l *lua.LState) int {
 	}
 
 	if l.GetTop() == 1 {
-		l.Push(lua.LNumber(buttonLayout.TextOffset))
+		l.Push(lua.LNumber(buttonLayout.TextOffsetX))
+		l.Push(lua.LNumber(buttonLayout.TextOffsetY))
 		return 1
 	}
 
-	newValue := l.CheckInt(2)
+	newValueX := l.CheckInt(2)
+	newValueY := l.CheckInt(3)
 
-	buttonLayout.TextOffset = newValue
+	buttonLayout.TextOffsetX = newValueX
+	buttonLayout.TextOffsetY = newValueY
 
 	return 0
 }

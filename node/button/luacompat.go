@@ -12,12 +12,36 @@ var LuaTypeExport = common.LuaTypeExport{
 	Name: luaTypeExportName,
 	//ConstructorFunc: newLuaEntity,
 	Methods: map[string]lua.LGFunction{
-		"node":    luaGetNode,
-		"active":  luaGetSetActive,
-		"enabled": luaGetSetEnabled,
-		"pressed": luaGetSetPressed,
-		"toggled": luaGetSetToggled,
+		"node":     luaGetNode,
+		"active":   luaGetSetActive,
+		"enabled":  luaGetSetEnabled,
+		"pressed":  luaGetSetPressed,
+		"toggled":  luaGetSetToggled,
+		"position": luaGetSetPosition,
 	},
+}
+
+func luaGetSetPosition(l *lua.LState) int {
+	button, err := FromLua(l.ToUserData(1))
+
+	if err != nil {
+		l.RaiseError("failed to convert")
+		return 0
+	}
+
+	if l.GetTop() == 1 {
+		l.Push(lua.LNumber(button.X))
+		l.Push(lua.LNumber(button.Y))
+		return 2
+	}
+
+	posX := l.ToNumber(2)
+	posY := l.ToNumber(3)
+
+	button.X = int(posX)
+	button.Y = int(posY)
+
+	return 0
 }
 
 func luaGetSetToggled(l *lua.LState) int {

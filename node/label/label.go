@@ -59,6 +59,7 @@ type Label struct {
 	FontGfx     common.SequenceProvider
 	Palette     string
 	Caption     string
+	BlendMode   rl.BlendMode
 	HAlign      LabelAlign
 	VAlign      LabelAlign
 }
@@ -69,6 +70,7 @@ func New(loaderProvider common.LoaderProvider, fontPath, palette string) (*Label
 		initialized: false,
 		HAlign:      LabelAlignStart,
 		VAlign:      LabelAlignStart,
+		BlendMode:   -1,
 	}
 
 	_, ok := common.PaletteTexture[palette]
@@ -146,10 +148,16 @@ func (l *Label) render() {
 		posY -= int(l.texture.Height)
 	}
 
-	rl.BeginShaderMode(common.PaletteShader)
+	if l.BlendMode > -1 {
+		rl.BeginBlendMode(l.BlendMode)
+	}
+	//rl.BeginShaderMode(common.PaletteShader)
 	rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
 	rl.DrawTexture(l.texture, int32(posX), int32(posY), rl.White)
-	rl.EndShaderMode()
+	//rl.EndShaderMode()
+	if l.BlendMode > -1 {
+		rl.EndBlendMode()
+	}
 
 }
 
@@ -160,25 +168,66 @@ func (l *Label) update(elapsed float64) {
 	}
 }
 
-func (l *Label) initializeTexture() {
-	width := 0
-	height := 0
+func (l *Label) getTextMetrics() (width, height int) {
+	var (
+		lineWidth  int
+		lineHeight int
+	)
 
-	charOffsets := make([]image.Point, len(l.Caption))
-
-	for idx := range l.Caption {
-		charOffsets[idx] = image.Point{X: width, Y: 0}
-		glyph := l.FontTable.Glyphs[rune(l.Caption[idx])]
-		width += glyph.Width()
-		gHeight := glyph.Height()
-		if gHeight > height {
-			height = gHeight
+	for _, c := range l.Caption {
+		if c == '\n' {
+			width = common.MaxInt(width, lineWidth)
+			height += lineHeight
+			lineWidth = 0
+			lineHeight = 0
+		} else {
+			glyph := l.FontTable.Glyphs[c]
+			lineWidth += glyph.Width()
+			lineHeight = common.MaxInt(lineHeight, glyph.Height())
 		}
 	}
 
+	width = common.MaxInt(width, lineWidth)
+	height += lineHeight
+
+	return width, height
+}
+
+func (l *Label) initializeTexture() {
+	charOffsets := make([]image.Point, len(l.Caption))
+	lineHeights := make([]int, 0)
+	tw := 0
+	th := 0
+	width := 0
+	height := 0
+	lineHeight := 0
+	for idx, c := range l.Caption {
+		charOffsets[idx] = image.Point{X: tw, Y: th}
+		glyph := l.FontTable.Glyphs[c]
+		glyphWidth := l.FontTable.Glyphs[c].Width()
+		lineHeight = common.MaxInt(lineHeight, l.FontGfx.FrameHeight(0, glyph.FrameIndex(), 1, 1))
+		width = common.MaxInt(width, glyphWidth+tw)
+		if l.Caption[idx] == '\n' {
+			height += lineHeight
+			lineHeights = append(lineHeights, lineHeight)
+			tw = 0
+			th += lineHeight
+			lineHeight = 0
+			continue
+		}
+		tw += glyphWidth
+	}
+	lineHeights = append(lineHeights, lineHeight)
+	height += lineHeight
+
 	pixels := make([]byte, width*height)
 
+	curLine := 0
 	for idx := range l.Caption {
+		if l.Caption[idx] == '\n' {
+			curLine++
+			continue
+		}
 		glyph := l.FontTable.Glyphs[rune(l.Caption[idx])]
 		frameIdx := glyph.FrameIndex()
 		glyphWidth := glyph.Width()
@@ -187,17 +236,20 @@ func (l *Label) initializeTexture() {
 		if glyphWidth == 0 || glyphHeight == 0 {
 			continue
 		}
+		for y := 0; y < l.FontGfx.FrameHeight(0, frameIdx, 1, 1); y++ {
+			for x := 0; x < l.FontGfx.FrameWidth(0, frameIdx, 1); x++ {
+				if x >= glyphWidth {
+					break
+				}
+				c := l.FontGfx.GetColorIndexAt(0, frameIdx, x, y)
+				tx := charOffsets[idx].X + x
+				ty := charOffsets[idx].Y + y
 
-		glyphOriginY := (l.FontGfx.FrameHeight(0, frameIdx) - glyphHeight) - 1
+				if tx < 0 || tx >= width || ty < 0 || ty >= height {
+					continue
+				}
 
-		for y := 0; y < glyphHeight; y++ {
-			if y+glyphOriginY < 0 {
-				continue
-			}
-
-			for x := 0; x < glyphWidth; x++ {
-				c := l.FontGfx.GetColorIndexAt(0, frameIdx, x, y+glyphOriginY)
-				idx := (charOffsets[idx].X + x) + ((charOffsets[idx].Y + y) * width)
+				idx := tx + (ty * width)
 				pixels[idx] = c
 			}
 		}

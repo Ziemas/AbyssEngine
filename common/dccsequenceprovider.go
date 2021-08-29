@@ -8,7 +8,7 @@ type DCCSequenceProvider struct {
 	Sequences []*dcc.Direction
 }
 
-func (d *DCCSequenceProvider) GetFrameOffsetX(sequenceId, frameId int) int {
+func (d *DCCSequenceProvider) FrameOffsetX(sequenceId, frameId int) int {
 	if sequenceId < 0 || sequenceId >= len(d.Sequences) {
 		return 0
 	}
@@ -16,7 +16,7 @@ func (d *DCCSequenceProvider) GetFrameOffsetX(sequenceId, frameId int) int {
 	return d.Sequences[sequenceId].Frame(frameId).XOffset
 }
 
-func (d *DCCSequenceProvider) GetFrameOffsetY(sequenceId, frameId int) int {
+func (d *DCCSequenceProvider) FrameOffsetY(sequenceId, frameId int) int {
 	if sequenceId < 0 || sequenceId >= len(d.Sequences) {
 		return 0
 	}
@@ -36,7 +36,7 @@ func (d *DCCSequenceProvider) FrameCount(sequenceId int) int {
 	return len(d.Sequences[sequenceId].Frames())
 }
 
-func (d *DCCSequenceProvider) FrameWidth(sequenceId, frameId int) int {
+func (d *DCCSequenceProvider) FrameWidth(sequenceId, frameId, frameSizeX int) int {
 	if sequenceId < 0 || sequenceId >= len(d.Sequences) {
 		return 0
 	}
@@ -45,10 +45,15 @@ func (d *DCCSequenceProvider) FrameWidth(sequenceId, frameId int) int {
 		return 0
 	}
 
-	return d.Sequences[sequenceId].Frames()[frameId].Width
+	width := 0
+	for i := 0; i < frameSizeX; i++ {
+		width += int(d.Sequences[sequenceId].Frames()[frameId+i].Width)
+	}
+
+	return width
 }
 
-func (d *DCCSequenceProvider) FrameHeight(sequenceId, frameId int) int {
+func (d *DCCSequenceProvider) FrameHeight(sequenceId, frameId, frameSizeX, frameSizeY int) int {
 	if sequenceId < 0 || sequenceId >= len(d.Sequences) {
 		return 0
 	}
@@ -57,7 +62,12 @@ func (d *DCCSequenceProvider) FrameHeight(sequenceId, frameId int) int {
 		return 0
 	}
 
-	return d.Sequences[sequenceId].Frame(frameId).Height
+	height := 0
+	for i := 0; i < frameSizeY; i++ {
+		height += d.Sequences[sequenceId].Frames()[frameId+(i*frameSizeX)].Height
+	}
+
+	return height
 }
 
 func (d *DCCSequenceProvider) GetColorIndexAt(sequenceId, frameId, x, y int) uint8 {

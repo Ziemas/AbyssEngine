@@ -1,18 +1,16 @@
 package buttonlayout
 
-import "image"
-
 type ButtonLayout struct {
 	ResourceName     string
 	PaletteName      string
 	FontPath         string
-	ClickableRect    *image.Rectangle
 	XSegments        int
 	YSegments        int
 	BaseFrame        int
 	DisabledFrame    int
 	DisabledColor    uint32
-	TextOffset       int
+	TextOffsetX      int
+	TextOffsetY      int
 	FixedWidth       int
 	FixedHeight      int
 	LabelColor       uint32

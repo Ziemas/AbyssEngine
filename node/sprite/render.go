@@ -81,15 +81,15 @@ func (s *Sprite) render() {
 
 	posX, posY := s.GetPosition()
 
-	posX += s.Sequences.GetFrameOffsetX(s.CurrentSequence(), s.CurrentFrame)
+	posX += s.Sequences.FrameOffsetX(s.CurrentSequence(), s.CurrentFrame)
 
-	if s.CellSizeX == 1 && s.CellSizeY == 1 {
-		posY -= s.Sequences.FrameHeight(s.CurrentSequence(), s.CurrentFrame)
+	if s.bottomOrigin {
+		posY -= s.Sequences.FrameHeight(s.CurrentSequence(), s.CurrentFrame, s.CellSizeX, s.CellSizeY)
 	}
 
-	posY += s.Sequences.GetFrameOffsetY(s.CurrentSequence(), s.CurrentFrame)
+	posY += s.Sequences.FrameOffsetY(s.CurrentSequence(), s.CurrentFrame)
 
-	rl.BeginShaderMode(common.PaletteShader)
+	// rl.BeginShaderMode(common.PaletteShader)
 	rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
 
 	if blendModeLookup[s.blendMode] != -1 {
@@ -102,20 +102,12 @@ func (s *Sprite) render() {
 		rl.EndBlendMode()
 	}
 
-	rl.EndShaderMode()
+	// rl.EndShaderMode()
 }
 
 func (s *Sprite) initializeTexture() {
-	width := 0
-	height := 0
-
-	for i := 0; i < s.CellSizeX; i++ {
-		width += s.Sequences.FrameWidth(s.CurrentSequence(), s.CurrentFrame+i)
-	}
-
-	for i := 0; i < s.CellSizeY; i++ {
-		height += s.Sequences.FrameHeight(s.CurrentSequence(), s.CurrentFrame+(i*s.CellSizeX))
-	}
+	width := s.Sequences.FrameWidth(s.CurrentSequence(), s.CurrentFrame, s.CellSizeX)
+	height := s.Sequences.FrameHeight(s.CurrentSequence(), s.CurrentFrame, s.CellSizeX, s.CellSizeY)
 
 	pixels := make([]byte, width*height)
 
@@ -126,8 +118,8 @@ func (s *Sprite) initializeTexture() {
 		for cellOffsetX := 0; cellOffsetX < s.CellSizeX; cellOffsetX++ {
 			cellIndex := s.CurrentFrame + (cellOffsetX + (cellOffsetY * s.CellSizeX))
 
-			frameWidth := s.Sequences.FrameWidth(s.CurrentSequence(), cellIndex)
-			frameHeight := s.Sequences.FrameHeight(s.CurrentSequence(), cellIndex)
+			frameWidth := s.Sequences.FrameWidth(s.CurrentSequence(), cellIndex, 1)
+			frameHeight := s.Sequences.FrameHeight(s.CurrentSequence(), cellIndex, 1, 1)
 
 			for y := 0; y < frameHeight; y++ {
 				idx := targetStartX + ((targetStartY + y) * width)
@@ -143,7 +135,7 @@ func (s *Sprite) initializeTexture() {
 		}
 
 		targetStartX = 0
-		targetStartY += s.Sequences.FrameHeight(s.CurrentSequence(), cellOffsetY*s.CellSizeX)
+		targetStartY += s.Sequences.FrameHeight(s.CurrentSequence(), cellOffsetY, 1, 1)
 	}
 
 	img := rl.NewImage(pixels, int32(width), int32(height), 1, rl.UncompressedGrayscale)

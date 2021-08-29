@@ -4,7 +4,9 @@ import (
 	"github.com/OpenDiablo2/AbyssEngine/common"
 	"github.com/OpenDiablo2/AbyssEngine/node"
 	"github.com/OpenDiablo2/AbyssEngine/node/button/buttonlayout"
+	"github.com/OpenDiablo2/AbyssEngine/node/label"
 	"github.com/OpenDiablo2/AbyssEngine/node/sprite"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 const (
@@ -22,6 +24,7 @@ type Button struct {
 	toggled      bool
 	onClick      func()
 	sprite       *sprite.Sprite
+	label        *label.Label
 	text         string
 }
 
@@ -47,6 +50,40 @@ func New(loaderProvider common.LoaderProvider, mousePositionProvider common.Mous
 		return nil, err
 	}
 
+	result.label, err = label.New(loaderProvider, buttonLayout.FontPath, buttonLayout.PaletteName)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if buttonLayout.FixedWidth >= 0 {
+		result.label.X = buttonLayout.FixedWidth / 2
+	} else {
+		width := result.sprite.Sequences.FrameWidth(result.sprite.CurrentSequence(), result.sprite.CurrentFrame, result.sprite.CellSizeX)
+		result.label.X = width / 2
+	}
+
+	if buttonLayout.FixedHeight >= 0 {
+		result.label.Y = buttonLayout.FixedHeight / 2
+	} else {
+		height := result.sprite.Sequences.FrameHeight(result.sprite.CurrentSequence(),
+			result.sprite.CurrentFrame, result.sprite.CellSizeX, result.sprite.CellSizeY)
+
+		result.label.Y = height / 2
+	}
+
+	result.label.X += buttonLayout.TextOffsetX
+	result.label.Y += buttonLayout.TextOffsetY
+	result.label.HAlign = label.LabelAlignCenter
+	result.label.VAlign = label.LabelAlignCenter
+	result.label.BlendMode = rl.BlendMultiplied
+
+	err = result.sprite.Node.AddChild(result.label.Node)
+
+	if err != nil {
+		return nil, err
+	}
+
 	result.sprite.CellSizeX = buttonLayout.XSegments
 	result.sprite.CellSizeY = buttonLayout.YSegments
 	err = result.AddChild(result.sprite.Node)
@@ -64,6 +101,7 @@ func (b *Button) SetText(newText string) {
 	}
 
 	b.text = newText
+	b.label.Caption = newText
 }
 
 func (b *Button) render() {

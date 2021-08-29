@@ -15,6 +15,7 @@ var LuaTypeExport = common.LuaTypeExport{
 		"node":                   luaGetNode,
 		"cellSize":               luaGetSetCellSize,
 		"active":                 luaGetSetActive,
+		"bottomOrigin":           luaGetSetBottomOrigin,
 		"visible":                luaGetSetVisible,
 		"position":               luaGetSetPosition,
 		"currentSequence":        luaGetSetCurrentSequence,
@@ -29,6 +30,25 @@ var LuaTypeExport = common.LuaTypeExport{
 		"playForward":            luaGetPlayForward,
 		"blendMode":              luaGetSetBlendMode,
 	},
+}
+
+func luaGetSetBottomOrigin(l *lua.LState) int {
+	sprite, err := FromLua(l.ToUserData(1))
+
+	if err != nil {
+		l.RaiseError("failed to convert")
+		return 0
+	}
+
+	if l.GetTop() == 1 {
+		l.Push(lua.LBool(sprite.bottomOrigin))
+		return 1
+	}
+
+	newValue := l.CheckBool(2)
+	sprite.bottomOrigin = newValue
+
+	return 0
 }
 
 func luaGetSetBlendMode(l *lua.LState) int {

@@ -36,6 +36,7 @@ type Sprite struct {
 	subStartingFrame  int
 	subEndingFrame    int
 	playLoop          bool
+	bottomOrigin      bool
 	blendMode         blendMode
 	onMouseButtonDown func()
 	onMouseButtonUp   func()
@@ -61,6 +62,7 @@ func New(loaderProvider common.LoaderProvider, mousePosProvider common.MousePosi
 		playLength:       defaultPlayLength,
 		playedCount:      0,
 		lastFrameTime:    0,
+		bottomOrigin:     false,
 		subStartingFrame: 0,
 		subEndingFrame:   0,
 		hasSubLoop:       false,

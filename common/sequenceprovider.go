@@ -3,9 +3,9 @@ package common
 type SequenceProvider interface {
 	SequenceCount() int
 	FrameCount(sequenceId int) int
-	FrameWidth(sequenceId, frameId int) int
-	FrameHeight(sequenceId, frameId int) int
+	FrameWidth(sequenceId, frameId, frameSizeX int) int
+	FrameHeight(sequenceId, frameId, frameSizeX, frameSizeY int) int
 	GetColorIndexAt(sequenceId, frameId, x, y int) uint8
-	GetFrameOffsetX(sequenceId, frameId int) int
-	GetFrameOffsetY(sequenceId, frameId int) int
+	FrameOffsetX(sequenceId, frameId int) int
+	FrameOffsetY(sequenceId, frameId int) int
 }

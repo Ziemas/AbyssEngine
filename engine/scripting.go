@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	rl "github.com/gen2brain/raylib-go/raylib"
 	"io/ioutil"
 	"path"
 	"reflect"
@@ -129,7 +130,22 @@ func (e *Engine) bootstrapScripts() {
 				// loads palette for use with sprites
 				"loadPalette": func(l *lua.LState) int { return e.luaLoadPalette(l) },
 
+				// loadButton(buttonDef: ButtonDef, [text: string])
+				// loads a button based on the button definition (and optionally a caption)
 				"loadButton": func(l *lua.LState) int { return e.luaLoadButton(l) },
+
+				// showSystemCursor(show: bool)
+				// shows or hides the system cursor
+				"showSystemCursor": func(l *lua.LState) int { return e.luaShowSystemCursor(l) },
+
+				// setTargetFps(fps: int)
+				// sets the target framerate
+				"setTargetFps": func(l *lua.LState) int { return e.luaSetTargetFps(l) },
+
+				// fullscreen(full: bool)
+				// fullscreen() bool
+				// Gets or sets fullscreen mode
+				"fullscreen": func(l *lua.LState) int { return e.luaFullscreen(l) },
 			})
 
 			e.luaState.Push(mod)
@@ -181,6 +197,24 @@ func (e *Engine) luaLoader(l *lua.LState) int {
 	return 1
 }
 
+func (e *Engine) luaFullscreen(l *lua.LState) int {
+	if l.GetTop() == 0 {
+		l.Push(lua.LBool(rl.IsWindowFullscreen()))
+		return 1
+	}
+
+	isFullscreen := rl.IsWindowFullscreen()
+	doFullscreen := l.CheckBool(1)
+
+	if doFullscreen && !isFullscreen {
+		e.toggleFullscreen = true
+	} else if !doFullscreen && isFullscreen {
+		e.toggleFullscreen = true
+	}
+
+	return 0
+}
+
 func (e *Engine) luaShutdown(l *lua.LState) int {
 	if l.GetTop() > 0 {
 		l.ArgError(1, "no arguments expected")
@@ -189,6 +223,26 @@ func (e *Engine) luaShutdown(l *lua.LState) int {
 
 	e.shutdown = true
 	log.Info().Msg("engine shutting down due to script SHUTDOWN command")
+	return 0
+}
+
+func (e *Engine) luaShowSystemCursor(l *lua.LState) int {
+	show := l.CheckBool(1)
+
+	if show {
+		rl.ShowCursor()
+		return 0
+	}
+
+	rl.HideCursor()
+	return 0
+}
+
+func (e *Engine) luaSetTargetFps(l *lua.LState) int {
+	fps := l.CheckNumber(1)
+
+	rl.SetTargetFPS(int32(fps))
+
 	return 0
 }
 
@@ -441,7 +495,7 @@ func (e *Engine) luaLoadSprite(l *lua.LState) int {
 }
 
 func (e *Engine) luaSetCursor(l *lua.LState) int {
-	if l.GetTop() != 1 {
+	if l.GetTop() != 3 {
 		l.ArgError(l.GetTop(), "expected one argument")
 		return 0
 	}
@@ -460,6 +514,8 @@ func (e *Engine) luaSetCursor(l *lua.LState) int {
 	}
 
 	e.cursorSprite = sprite
+	e.cursorOffset.X = l.CheckInt(2)
+	e.cursorOffset.Y = l.CheckInt(3)
 
 	return 0
 }
