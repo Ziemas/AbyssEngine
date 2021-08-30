@@ -2,11 +2,10 @@ package engine
 
 import (
 	"fmt"
+	lua "github.com/yuin/gopher-lua"
 	"image"
 	"math"
 	"runtime"
-
-	lua "github.com/yuin/gopher-lua"
 
 	"github.com/OpenDiablo2/AbyssEngine/common"
 	"github.com/OpenDiablo2/AbyssEngine/loader"
@@ -36,6 +35,26 @@ type Engine struct {
 	isFullscreen     bool
 	cursorOffset     image.Point
 	luaState         *lua.LState
+	currentBlendMode common.BlendMode
+}
+
+func (e *Engine) SetBlendMode(mode common.BlendMode) {
+	if e.currentBlendMode == mode {
+		return
+	}
+
+	if e.currentBlendMode != common.BlendModeNone {
+		rl.EndBlendMode()
+	}
+
+	e.currentBlendMode = mode
+
+	if mode == common.BlendModeNone {
+		return
+	}
+
+	rlBlendMode := common.BlendModeLookup[mode]
+	rl.BeginBlendMode(rlBlendMode)
 }
 
 func (e *Engine) GetMousePosition() (X, Y int) {
@@ -54,9 +73,15 @@ func (e *Engine) GetLanguageFontCode() string {
 
 // New creates a new instance of the engine
 func New(config Configuration) *Engine {
+	runtime.LockOSThread()
+
 	rl.SetConfigFlags(rl.FlagWindowResizable)
 	rl.InitWindow(800, 600, "Abyss Engine")
 	rl.SetWindowMinSize(800, 600)
+
+	windowIcon := rl.LoadImageFromMemory(".png", media.AbyssIcon, int32(len(media.BootLogo)))
+	rl.SetWindowIcon(*windowIcon)
+
 	result := &Engine{
 		shutdown:         false,
 		toggleFullscreen: false,
@@ -67,6 +92,7 @@ func New(config Configuration) *Engine {
 		systemFont:       rl.LoadFontFromMemory(".ttf", media.FontDiabloHeavy, int32(len(media.FontDiabloHeavy)), 18, nil, 0),
 		rootNode:         node.New(),
 		cursorOffset:     image.Point{},
+		currentBlendMode: common.BlendModeNone,
 	}
 
 	result.loader = loader.New(result)
@@ -100,6 +126,7 @@ func (e *Engine) Run() {
 			break
 		}
 
+		rl.BeginDrawing()
 		rl.BeginTextureMode(e.renderSurface)
 		rl.ClearBackground(rl.Black)
 
@@ -107,11 +134,16 @@ func (e *Engine) Run() {
 		case EngineModeBoot:
 			e.showBootSplash()
 		case EngineModeGame:
+			rl.BeginShaderMode(common.PaletteShader)
+			e.currentBlendMode = common.BlendModeNone
 			e.showGame()
+			e.SetBlendMode(common.BlendModeNone)
+			rl.EndShaderMode()
 		}
 
 		rl.EndTextureMode()
 		e.drawMainSurface()
+		rl.EndDrawing()
 
 		if e.engineMode == EngineModeGame {
 			e.updateGame(float64(rl.GetFrameTime()))
@@ -170,7 +202,6 @@ func (e *Engine) showBootSplash() {
 }
 
 func (e *Engine) drawMainSurface() {
-	rl.BeginDrawing()
 	rl.ClearBackground(rl.Black)
 	scale := float32(math.Min(float64(rl.GetScreenWidth())/800.0, float64(rl.GetScreenHeight())/600.0))
 
@@ -190,7 +221,6 @@ func (e *Engine) drawMainSurface() {
 	rl.DrawTextEx(e.systemFont, fmt.Sprintf("GC: %d (%%%d)", int(memStats.NumGC), int(memStats.GCCPUFraction*100)), rl.Vector2{X: 5, Y: 21}, 18, 0, rl.White)
 	rl.DrawTextEx(e.systemFont, fmt.Sprintf("Alloc: %0.2fMB (%0.2fMB)", float32(memStats.Alloc)/1024/1024, float32(memStats.Sys)/1024/1024), rl.Vector2{X: 5, Y: 37}, 18, 0, rl.White)
 
-	rl.EndDrawing()
 }
 
 func (e *Engine) panic(msg string) {

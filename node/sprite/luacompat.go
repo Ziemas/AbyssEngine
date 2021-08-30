@@ -60,11 +60,11 @@ func luaGetSetBlendMode(l *lua.LState) int {
 	}
 
 	if l.GetTop() == 1 {
-		l.Push(lua.LString(blendModeToString(sprite.blendMode)))
+		l.Push(lua.LString(common.BlendModeToString(sprite.blendMode)))
 		return 1
 	}
 
-	newMode, err := stringToBlendMode(l.CheckString(2))
+	newMode, err := common.StringToBlendMode(l.CheckString(2))
 
 	if err != nil {
 		l.RaiseError(err.Error())

@@ -458,7 +458,7 @@ func (e *Engine) luaLoadButton(l *lua.LState) int {
 		return 0
 	}
 
-	button, err := button.New(e.loader, e, *buttonLayout)
+	button, err := button.New(e.loader, e, e, *buttonLayout)
 
 	if err != nil {
 		l.RaiseError(err.Error())
@@ -483,7 +483,7 @@ func (e *Engine) luaLoadSprite(l *lua.LState) int {
 	filePath := l.CheckString(1)
 	palette := l.CheckString(2)
 
-	result, err := sprite.New(e.loader, e, filePath, palette)
+	result, err := sprite.New(e.loader, e, e, filePath, palette)
 
 	if err != nil {
 		l.RaiseError(err.Error())
@@ -575,14 +575,14 @@ func (e *Engine) luaLoadPalette(l *lua.LState) int {
 
 func (e *Engine) luaLoadLabel(l *lua.LState) int {
 	if l.GetTop() < 2 {
-		l.ArgError(l.GetTop(), "expected at leaset two arguments")
+		l.ArgError(l.GetTop(), "expected at least two arguments")
 		return 0
 	}
 
 	fontPath := l.CheckString(1)
 	palette := l.CheckString(2)
 
-	result, err := label.New(e.loader, fontPath, palette)
+	result, err := label.New(e.loader, e, fontPath, palette)
 
 	if err != nil {
 		l.RaiseError(err.Error())

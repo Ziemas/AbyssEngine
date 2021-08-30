@@ -18,6 +18,7 @@ type Sprite struct {
 
 	mousePosProvider  common.MousePositionProvider
 	Sequences         common.SequenceProvider
+	blendModeProvider common.BlendModeProvider
 	palette           string
 	currentSequence   int
 	CurrentFrame      int
@@ -37,7 +38,7 @@ type Sprite struct {
 	subEndingFrame    int
 	playLoop          bool
 	bottomOrigin      bool
-	blendMode         blendMode
+	blendMode         common.BlendMode
 	paletteShift      int
 	onMouseButtonDown func()
 	onMouseButtonUp   func()
@@ -46,29 +47,33 @@ type Sprite struct {
 }
 
 func New(loaderProvider common.LoaderProvider, mousePosProvider common.MousePositionProvider,
+	blendModeProvider common.BlendModeProvider,
 	filePath, palette string) (*Sprite, error) {
 	result := &Sprite{
-		Node:             node.New(),
-		mousePosProvider: mousePosProvider,
-		Visible:          true,
-		currentSequence:  0,
-		CurrentFrame:     0,
-		CellSizeX:        1,
-		CellSizeY:        1,
-		textures:         make([]rl.Texture2D, 0),
-		isPressed:        false,
-		isMouseOver:      false,
-		canPress:         true,
-		playMode:         playModePause,
-		playLength:       defaultPlayLength,
-		playedCount:      0,
-		lastFrameTime:    0,
-		bottomOrigin:     false,
-		subStartingFrame: 0,
-		subEndingFrame:   0,
-		hasSubLoop:       false,
-		playLoop:         true,
-		palette:          palette,
+		Node:              node.New(),
+		mousePosProvider:  mousePosProvider,
+		blendModeProvider: blendModeProvider,
+		Visible:           true,
+		currentSequence:   0,
+		CurrentFrame:      0,
+		CellSizeX:         1,
+		CellSizeY:         1,
+		textures:          make([]rl.Texture2D, 0),
+		isPressed:         false,
+		isMouseOver:       false,
+		canPress:          true,
+		playMode:          playModePause,
+		playLength:        defaultPlayLength,
+		playedCount:       0,
+		lastFrameTime:     0,
+		paletteShift:      0,
+		bottomOrigin:      false,
+		blendMode:         common.BlendModeNone,
+		subStartingFrame:  0,
+		subEndingFrame:    0,
+		hasSubLoop:        false,
+		playLoop:          true,
+		palette:           palette,
 	}
 
 	result.RenderCallback = result.render

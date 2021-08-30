@@ -1,70 +1,9 @@
 package sprite
 
 import (
-	"errors"
-	"strings"
-
 	"github.com/OpenDiablo2/AbyssEngine/common"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
-
-type blendMode int
-
-const (
-	blendModeNone blendMode = iota
-	blendModeAlpha
-	blendModeAdditive
-	blendModeMultiplied
-	blendModeAddColors
-	blendModeSubtractColors
-)
-
-var blendModeLookup = []rl.BlendMode{
-	-1,
-	rl.BlendAlpha,
-	rl.BlendAdditive,
-	rl.BlendMultiplied,
-	rl.BlendAddColors,
-	rl.BlendSubtractColors,
-}
-
-func blendModeToString(mode blendMode) string {
-	switch mode {
-	case blendModeNone:
-		return ""
-	case blendModeAlpha:
-		return "alpha"
-	case blendModeAdditive:
-		return "add"
-	case blendModeMultiplied:
-		return "multiply"
-	case blendModeAddColors:
-		return "addcolors"
-	case blendModeSubtractColors:
-		return "subcolors"
-	default:
-		return ""
-	}
-}
-
-func stringToBlendMode(mode string) (blendMode, error) {
-	switch strings.ToLower(mode) {
-	case "":
-		return blendModeNone, nil
-	case "alpha":
-		return blendModeAlpha, nil
-	case "add":
-		return blendModeAdditive, nil
-	case "multiply":
-		return blendModeMultiplied, nil
-	case "addcolors":
-		return blendModeAddColors, nil
-	case "subcolors":
-		return blendModeSubtractColors, nil
-	default:
-		return -1, errors.New("invalid blend mode")
-	}
-}
 
 func (s *Sprite) render() {
 	if s.textures[s.CurrentFrame].ID == 0 || !s.Visible || !s.Active {
@@ -89,22 +28,11 @@ func (s *Sprite) render() {
 
 	posY += s.Sequences.FrameOffsetY(s.CurrentSequence(), s.CurrentFrame)
 
-	rl.BeginShaderMode(common.PaletteShader)
 	rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
-
 	rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(s.paletteShift)}, rl.ShaderUniformFloat)
-
-	if blendModeLookup[s.blendMode] != -1 {
-		rl.BeginBlendMode(blendModeLookup[s.blendMode])
-	}
-
+	s.blendModeProvider.SetBlendMode(s.blendMode)
 	rl.DrawTexture(s.textures[s.CurrentFrame], int32(posX), int32(posY), rl.White)
 
-	if blendModeLookup[s.blendMode] != -1 {
-		rl.EndBlendMode()
-	}
-
-	rl.EndShaderMode()
 }
 
 func (s *Sprite) initializeTexture() {

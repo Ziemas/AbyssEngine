@@ -6,7 +6,6 @@ import (
 	"github.com/OpenDiablo2/AbyssEngine/node/button/buttonlayout"
 	"github.com/OpenDiablo2/AbyssEngine/node/label"
 	"github.com/OpenDiablo2/AbyssEngine/node/sprite"
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 const (
@@ -29,6 +28,7 @@ type Button struct {
 }
 
 func New(loaderProvider common.LoaderProvider, mousePositionProvider common.MousePositionProvider,
+	blendModeProvider common.BlendModeProvider,
 	buttonLayout buttonlayout.ButtonLayout) (*Button, error) {
 	result := &Button{
 		Node:         node.New(),
@@ -43,14 +43,14 @@ func New(loaderProvider common.LoaderProvider, mousePositionProvider common.Mous
 
 	var err error
 
-	result.sprite, err = sprite.New(loaderProvider, mousePositionProvider,
+	result.sprite, err = sprite.New(loaderProvider, mousePositionProvider, blendModeProvider,
 		buttonLayout.ResourceName, buttonLayout.PaletteName)
 
 	if err != nil {
 		return nil, err
 	}
 
-	result.label, err = label.New(loaderProvider, buttonLayout.FontPath, buttonLayout.PaletteName)
+	result.label, err = label.New(loaderProvider, blendModeProvider, buttonLayout.FontPath, buttonLayout.PaletteName)
 
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func New(loaderProvider common.LoaderProvider, mousePositionProvider common.Mous
 	result.label.Y += buttonLayout.TextOffsetY
 	result.label.HAlign = label.LabelAlignCenter
 	result.label.VAlign = label.LabelAlignCenter
-	result.label.BlendMode = rl.BlendMultiplied
+	result.label.BlendMode = common.BlendModeMultiplied
 
 	err = result.sprite.Node.AddChild(result.label.Node)
 
@@ -86,6 +86,7 @@ func New(loaderProvider common.LoaderProvider, mousePositionProvider common.Mous
 
 	result.sprite.CellSizeX = buttonLayout.XSegments
 	result.sprite.CellSizeY = buttonLayout.YSegments
+
 	err = result.AddChild(result.sprite.Node)
 
 	if err != nil {

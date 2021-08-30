@@ -44,6 +44,7 @@ func main() {
 	log.Info().Msg("Abyss Engine")
 	log.Debug().Msgf("Runtime Path: %s", runPath)
 
+	rl.SetTraceLog(4)
 	rl.SetTraceLogCallback(func(logLevel int, s string) {
 		[]func() *zerolog.Event{
 			log.Trace,

@@ -52,27 +52,29 @@ func StringToLabelAlign(s string) (LabelAlign, error) {
 type Label struct {
 	*node.Node
 
-	initialized bool
-	hasTexture  bool
-	texture     rl.Texture2D
-	FontTable   *tblfont.FontTable
-	FontGfx     common.SequenceProvider
-	Palette     string
-	Caption     string
-	BlendMode   rl.BlendMode
-	color       int
-	HAlign      LabelAlign
-	VAlign      LabelAlign
+	initialized       bool
+	hasTexture        bool
+	texture           rl.Texture2D
+	FontTable         *tblfont.FontTable
+	FontGfx           common.SequenceProvider
+	BlendModeProvider common.BlendModeProvider
+	Palette           string
+	Caption           string
+	BlendMode         common.BlendMode
+	color             int
+	HAlign            LabelAlign
+	VAlign            LabelAlign
 }
 
-func New(loaderProvider common.LoaderProvider, fontPath, palette string) (*Label, error) {
+func New(loaderProvider common.LoaderProvider, blendModeProvider common.BlendModeProvider, fontPath, palette string) (*Label, error) {
 	result := &Label{
-		Node:        node.New(),
-		initialized: false,
-		HAlign:      LabelAlignStart,
-		VAlign:      LabelAlignStart,
-		BlendMode:   -1,
-		color:       7,
+		Node:              node.New(),
+		BlendModeProvider: blendModeProvider,
+		initialized:       false,
+		HAlign:            LabelAlignStart,
+		VAlign:            LabelAlignStart,
+		BlendMode:         common.BlendModeNone,
+		color:             7,
 	}
 
 	_, ok := common.PaletteTexture[palette]
@@ -150,17 +152,10 @@ func (l *Label) render() {
 		posY -= int(l.texture.Height)
 	}
 
-	if l.BlendMode > -1 {
-		rl.BeginBlendMode(l.BlendMode)
-	}
-	rl.BeginShaderMode(common.PaletteShader)
+	l.BlendModeProvider.SetBlendMode(l.BlendMode)
 	rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
 	rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(l.color+common.PaletteTextShiftOffset) / float32(common.PaletteTransformsCount-1)}, rl.ShaderUniformFloat)
 	rl.DrawTexture(l.texture, int32(posX), int32(posY), rl.White)
-	rl.EndShaderMode()
-	if l.BlendMode > -1 {
-		rl.EndBlendMode()
-	}
 
 }
 
