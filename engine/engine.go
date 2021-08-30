@@ -73,8 +73,6 @@ func (e *Engine) GetLanguageFontCode() string {
 
 // New creates a new instance of the engine
 func New(config Configuration) *Engine {
-	runtime.LockOSThread()
-
 	rl.SetConfigFlags(rl.FlagWindowResizable)
 	rl.InitWindow(800, 600, "Abyss Engine")
 	rl.SetWindowMinSize(800, 600)
