@@ -111,26 +111,25 @@ func Init() *glfw.Window {
 	return window
 }
 
+
+func QueueDraw(drawable Renderable) {
+	drawList.PushBack(drawable)
+}
+
 func framebufferSizeCallback(w *glfw.Window, width int, height int) {
-	//rX := float32(width) / 800.0
-	//rY := float32(height) / 600.0
-	projection = mgl32.Ortho(0, float32(width), float32(height), 0, -1.0, 1.0)
-	gl.Viewport(0, 0, int32(width), int32(height))
+	ratio := 4.0 / 3.0
+	vW := width
+	vH := int(float64(width) / ratio)
 
-	//var r float32
-	//if rX < rY {
-	//	r = rX
-	//} else {
-	//	r = rY
-	//}
+	if (vH > height) {
+		vH = height
+		vW = int(float64(height) * ratio)
+	}
 
-	//vW := int(r * 800)
-	//vH := int(r * 600)
+	vX := (width - vW) / 2
+	vY := (height - vH) / 2
 
-	//vX := int((float32(width)-800.0*r) / 2)
-	//vY := int((float32(width)-600.0*r) / 2)
-
-	//gl.Viewport(int32(vX), int32(vY), int32(vW), int32(vH))
+	gl.Viewport(int32(vX), int32(vY), int32(vW), int32(vH))
 
 	Width = width
 	Height = height
