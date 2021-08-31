@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"image"
 	"image/png"
+	"math"
 	"runtime"
 
 	lua "github.com/yuin/gopher-lua"
