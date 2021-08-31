@@ -196,17 +196,17 @@ func (e *Engine) showGame() {
 func (e *Engine) updateGame(elapsed float64) {
 	e.rootNode.Update(elapsed)
 	if e.cursorSprite != nil {
-		//scale := float32(math.Min(float64(rl.GetScreenWidth())/800.0, float64(rl.GetScreenHeight())/600.0))
-		//xOrigin := (float32(rl.GetScreenWidth()) - (800.0 * scale)) * 0.5
-		//yOrigin := (float32(rl.GetScreenHeight()) - (600.0 * scale)) * 0.5
+		scale := float32(math.Min(float64(ren.GetScreenWidth())/800.0, float64(ren.GetScreenHeight())/600.0))
+		xOrigin := (float32(ren.GetScreenWidth()) - (800.0 * scale)) * 0.5
+		yOrigin := (float32(ren.GetScreenHeight()) - (600.0 * scale)) * 0.5
 
-		//e.cursorX = int((float32(rl.GetMouseX()) - xOrigin) * (1.0 / scale))
-		//e.cursorSprite.X = e.cursorX + e.cursorOffset.X
+		e.cursorX = int((float32(ren.GetMouseX()) - xOrigin) * (1.0 / scale))
+		e.cursorSprite.X = e.cursorX + e.cursorOffset.X
 
-		//e.cursorY = int((float32(rl.GetMouseY()) - yOrigin) * (1.0 / scale))
-		//e.cursorSprite.Y = e.cursorY + e.cursorOffset.Y
+		e.cursorY = int((float32(ren.GetMouseY()) - yOrigin) * (1.0 / scale))
+		e.cursorSprite.Y = e.cursorY + e.cursorOffset.Y
 
-		//e.cursorSprite.Update(elapsed)
+		e.cursorSprite.Update(elapsed)
 	}
 }
 

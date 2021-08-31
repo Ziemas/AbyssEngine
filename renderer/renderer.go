@@ -90,8 +90,11 @@ func Init() *glfw.Window {
 
 	window.SetAspectRatio(4, 3)
 	window.SetFramebufferSizeCallback(framebufferSizeCallback)
+	window.SetCursorPosCallback(cursorPosCallback)
+	window.SetMouseButtonCallback(mouseButtonCallback)
 
 	window.MakeContextCurrent()
+	window.SetInputMode(glfw.CursorMode, glfw.CursorHidden)
 
 	err = gl.Init()
 	if err != nil {
