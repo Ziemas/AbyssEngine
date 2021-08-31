@@ -41,21 +41,24 @@ type Engine struct {
 	isFullscreen     bool
 	cursorOffset     image.Point
 	luaState         *lua.LState
-	currentBlendMode common.BlendMode
+	currentBlendMode ren.BlendMode
+	prevTime         float64
 }
 
-func (e *Engine) SetBlendMode(mode common.BlendMode) {
+func (e *Engine) SetBlendMode(mode ren.BlendMode) {
 	if e.currentBlendMode == mode {
 		return
 	}
 
-	if e.currentBlendMode != common.BlendModeNone {
+	ren.SetBlendMode(mode)
+
+	if e.currentBlendMode != ren.BlendModeNone {
 		//rl.EndBlendMode()
 	}
 
 	e.currentBlendMode = mode
 
-	if mode == common.BlendModeNone {
+	if mode == ren.BlendModeNone {
 		return
 	}
 
@@ -102,7 +105,7 @@ func New(config Configuration) *Engine {
 		//systemFont:       rl.LoadFontFromMemory(".ttf", media.FontDiabloHeavy, int32(len(media.FontDiabloHeavy)), 18, nil, 0),
 		rootNode:         node.New(),
 		cursorOffset:     image.Point{},
-		currentBlendMode: common.BlendModeNone,
+		currentBlendMode: ren.BlendModeNone,
 	}
 
 	result.loader = loader.New(result)
@@ -148,9 +151,9 @@ func (e *Engine) Run() {
 			ren.EndShader()
 		case EngineModeGame:
 			ren.BeginShader(common.PaletteShader)
-			e.currentBlendMode = common.BlendModeNone
+			e.currentBlendMode = ren.BlendModeNone
 			e.showGame()
-			e.SetBlendMode(common.BlendModeNone)
+			e.SetBlendMode(ren.BlendModeNone)
 			ren.EndShader()
 		}
 
@@ -160,8 +163,12 @@ func (e *Engine) Run() {
 		glfw.PollEvents()
 		//rl.EndDrawing()
 
+		time := glfw.GetTime()
+		delta := time - e.prevTime
+		e.prevTime = time
+
 		if e.engineMode == EngineModeGame {
-			e.updateGame(float64(glfw.GetTime()))
+			e.updateGame(delta)
 		}
 
 		if e.toggleFullscreen {
@@ -207,9 +214,9 @@ func (e *Engine) showBootSplash() {
 	//rl.DrawTexture(e.bootLogo, int32(rl.GetScreenWidth()/3)-(e.bootLogo.Width/2),
 	//	int32(rl.GetScreenHeight()/2)-(e.bootLogo.Height/2), rl.White)
 
-	//ren.DrawTexture(e.bootLogo, (ren.GetScreenWidth()/3)-(e.bootLogo.Width/2),
-	//	(ren.GetScreenHeight()/2)-(e.bootLogo.Height/2) )
-	ren.DrawTexture(e.bootLogo, (ren.GetScreenWidth()/2)+(e.bootLogo.Width), ren.GetScreenHeight()/2+(e.bootLogo.Height))
+	ren.DrawTexture(e.bootLogo, (ren.GetScreenWidth()/3)-(e.bootLogo.Width/2),
+		(ren.GetScreenHeight()/2)-(e.bootLogo.Height/2))
+	//ren.DrawTexture(e.bootLogo, (ren.GetScreenWidth()/2)+(e.bootLogo.Width), ren.GetScreenHeight()/2+(e.bootLogo.Height))
 
 	//textX := float32(rl.GetScreenWidth()) / 2
 	//textY := float32(rl.GetScreenHeight()/2) - 20

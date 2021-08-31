@@ -3,7 +3,7 @@
 in vec2 TexCoords;
 out vec4 color;
 
-layout (location = 0) uniform sampler2D image;
+layout (location = 3) uniform sampler2D image;
 
 void main()
 {

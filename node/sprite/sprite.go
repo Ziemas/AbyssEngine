@@ -39,7 +39,7 @@ type Sprite struct {
 	subEndingFrame    int
 	playLoop          bool
 	bottomOrigin      bool
-	blendMode         common.BlendMode
+	blendMode         ren.BlendMode
 	paletteShift      int
 	onMouseButtonDown func()
 	onMouseButtonUp   func()
@@ -60,7 +60,7 @@ func New(loaderProvider common.LoaderProvider, mousePosProvider common.MousePosi
 		CellSizeX:         1,
 		CellSizeY:         1,
 		//textures:          make([]rl.Texture2D, 0),
-		textures:          make([]ren.Texture, 0),
+		textures:         make([]ren.Texture, 0),
 		isPressed:        false,
 		isMouseOver:      false,
 		canPress:         true,
@@ -70,7 +70,7 @@ func New(loaderProvider common.LoaderProvider, mousePosProvider common.MousePosi
 		lastFrameTime:    0,
 		paletteShift:     0,
 		bottomOrigin:     false,
-		blendMode:        common.BlendModeNone,
+		blendMode:        ren.BlendModeNone,
 		subStartingFrame: 0,
 		subEndingFrame:   0,
 		hasSubLoop:       false,

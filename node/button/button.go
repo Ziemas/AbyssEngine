@@ -6,6 +6,7 @@ import (
 	"github.com/OpenDiablo2/AbyssEngine/node/button/buttonlayout"
 	"github.com/OpenDiablo2/AbyssEngine/node/label"
 	"github.com/OpenDiablo2/AbyssEngine/node/sprite"
+	ren "github.com/OpenDiablo2/AbyssEngine/renderer"
 )
 
 const (
@@ -76,7 +77,7 @@ func New(loaderProvider common.LoaderProvider, mousePositionProvider common.Mous
 	result.label.Y += buttonLayout.TextOffsetY
 	result.label.HAlign = label.LabelAlignCenter
 	result.label.VAlign = label.LabelAlignCenter
-	result.label.BlendMode = common.BlendModeMultiplied
+	result.label.BlendMode = ren.BlendModeMultiplied
 
 	err = result.sprite.Node.AddChild(result.label.Node)
 

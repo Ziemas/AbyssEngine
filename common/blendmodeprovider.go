@@ -3,64 +3,46 @@ package common
 import (
 	"errors"
 	"strings"
+	ren "github.com/OpenDiablo2/AbyssEngine/renderer"
 )
-
-type BlendMode int
-
-const (
-	BlendModeNone BlendMode = iota
-	BlendModeAlpha
-	BlendModeAdditive
-	BlendModeMultiplied
-	BlendModeAddColors
-	BlendModeSubtractColors
-)
-
-//var BlendModeLookup = map[BlendMode]rl.BlendMode{
-//	BlendModeAlpha:          rl.BlendAlpha,
-//	BlendModeAdditive:       rl.BlendAdditive,
-//	BlendModeMultiplied:     rl.BlendMultiplied,
-//	BlendModeAddColors:      rl.BlendAddColors,
-//	BlendModeSubtractColors: rl.BlendSubtractColors,
-//}
 
 type BlendModeProvider interface {
-	SetBlendMode(mode BlendMode)
+	SetBlendMode(mode ren.BlendMode)
 }
 
-func BlendModeToString(mode BlendMode) string {
+func BlendModeToString(mode ren.BlendMode) string {
 	switch mode {
-	case BlendModeNone:
+	case ren.BlendModeNone:
 		return ""
-	case BlendModeAlpha:
+	case ren.BlendModeAlpha:
 		return "alpha"
-	case BlendModeAdditive:
+	case ren.BlendModeAdditive:
 		return "add"
-	case BlendModeMultiplied:
+	case ren.BlendModeMultiplied:
 		return "multiply"
-	case BlendModeAddColors:
+	case ren.BlendModeAddColors:
 		return "addcolors"
-	case BlendModeSubtractColors:
+	case ren.BlendModeSubtractColors:
 		return "subcolors"
 	default:
 		return ""
 	}
 }
 
-func StringToBlendMode(mode string) (BlendMode, error) {
+func StringToBlendMode(mode string) (ren.BlendMode, error) {
 	switch strings.ToLower(mode) {
 	case "":
-		return BlendModeNone, nil
+		return ren.BlendModeNone, nil
 	case "alpha":
-		return BlendModeAlpha, nil
+		return ren.BlendModeAlpha, nil
 	case "add":
-		return BlendModeAdditive, nil
+		return ren.BlendModeAdditive, nil
 	case "multiply":
-		return BlendModeMultiplied, nil
+		return ren.BlendModeMultiplied, nil
 	case "addcolors":
-		return BlendModeAddColors, nil
+		return ren.BlendModeAddColors, nil
 	case "subcolors":
-		return BlendModeSubtractColors, nil
+		return ren.BlendModeSubtractColors, nil
 	default:
 		return -1, errors.New("invalid blend mode")
 	}

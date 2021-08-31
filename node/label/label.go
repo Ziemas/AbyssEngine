@@ -7,9 +7,9 @@ import (
 	"io"
 	"strings"
 
-
 	"github.com/OpenDiablo2/AbyssEngine/common"
 	"github.com/OpenDiablo2/AbyssEngine/node"
+	ren "github.com/OpenDiablo2/AbyssEngine/renderer"
 	dc6 "github.com/OpenDiablo2/dc6/pkg"
 	tblfont "github.com/OpenDiablo2/tbl_font/pkg"
 )
@@ -51,15 +51,16 @@ func StringToLabelAlign(s string) (LabelAlign, error) {
 type Label struct {
 	*node.Node
 
-	initialized       bool
-	hasTexture        bool
+	initialized bool
+	hasTexture  bool
 	//texture           rl.Texture2D
+	texture           ren.Texture
 	FontTable         *tblfont.FontTable
 	FontGfx           common.SequenceProvider
 	BlendModeProvider common.BlendModeProvider
 	Palette           string
 	Caption           string
-	BlendMode         common.BlendMode
+	BlendMode         ren.BlendMode
 	color             int
 	HAlign            LabelAlign
 	VAlign            LabelAlign
@@ -72,7 +73,7 @@ func New(loaderProvider common.LoaderProvider, blendModeProvider common.BlendMod
 		initialized:       false,
 		HAlign:            LabelAlignStart,
 		VAlign:            LabelAlignStart,
-		BlendMode:         common.BlendModeNone,
+		BlendMode:         ren.BlendModeNone,
 		color:             7,
 	}
 
@@ -135,26 +136,37 @@ func (l *Label) render() {
 	//	tex.Init = true
 	//}
 
-	//posX, posY := l.GetPosition()
+	tex := common.PaletteTexture[l.Palette]
+	if !tex.Init {
+		//img := rl.NewImage(tex.Data, 256, int32(common.PaletteTransformsCount), 1, rl.UncompressedR8g8b8a8)
+		//tex.Texture = rl.LoadTextureFromImage(img)
+		tex.Texture = ren.NewTextureRGBABytes(tex.Data, 256, common.PaletteTransformsCount)
+
+		tex.Init = true
+	}
+
+	posX, posY := l.GetPosition()
 
 	switch l.HAlign {
 	case LabelAlignCenter:
-		//posX -= int(l.texture.Width / 2)
+		posX -= int(l.texture.Width / 2)
 	case LabelAlignEnd:
-		//posX -= int(l.texture.Width)
+		posX -= int(l.texture.Width)
 	}
 
 	switch l.VAlign {
 	case LabelAlignCenter:
-		//posY -= int(l.texture.Height / 2)
+		posY -= int(l.texture.Height / 2)
 	case LabelAlignEnd:
-		//posY -= int(l.texture.Height)
+		posY -= int(l.texture.Height)
 	}
 
 	l.BlendModeProvider.SetBlendMode(l.BlendMode)
 	//rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
 	//rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(l.color+common.PaletteTextShiftOffset) / float32(common.PaletteTransformsCount-1)}, rl.ShaderUniformFloat)
 	//rl.DrawTexture(l.texture, int32(posX), int32(posY), rl.White)
+	ren.SetShaderValueF(common.PaletteShaderOffsetLoc, float32(l.color+common.PaletteTextShiftOffset)/float32(common.PaletteTransformsCount-1))
+	ren.DrawTextureP(l.texture, posX, posY, tex.Texture, common.PaletteShaderLoc)
 
 }
 
@@ -258,7 +270,9 @@ func (l *Label) initializeTexture() {
 		l.hasTexture = true
 	} else {
 		//rl.UnloadTexture(l.texture)
+		ren.UnloadTexture(l.texture)
 	}
 
+	l.texture = ren.NewTextureIndexed(pixels, width, height)
 	//l.texture = rl.LoadTextureFromImage(img)
 }

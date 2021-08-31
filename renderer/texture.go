@@ -49,6 +49,10 @@ func DrawTexture(texture Texture, posX, posY int) {
 
 }
 
+func UnloadTexture(t Texture) {
+	gl.DeleteTextures(1, &t.ID)
+}
+
 func (t *Texture) Bind() {
 	gl.BindTexture(gl.TEXTURE_2D, t.ID)
 }
