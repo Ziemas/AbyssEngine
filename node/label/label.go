@@ -7,7 +7,6 @@ import (
 	"io"
 	"strings"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
 
 	"github.com/OpenDiablo2/AbyssEngine/common"
 	"github.com/OpenDiablo2/AbyssEngine/node"
@@ -54,7 +53,7 @@ type Label struct {
 
 	initialized       bool
 	hasTexture        bool
-	texture           rl.Texture2D
+	//texture           rl.Texture2D
 	FontTable         *tblfont.FontTable
 	FontGfx           common.SequenceProvider
 	BlendModeProvider common.BlendModeProvider
@@ -128,34 +127,34 @@ func (l *Label) render() {
 		return
 	}
 
-	tex := common.PaletteTexture[l.Palette]
-	if !tex.Init {
-		img := rl.NewImage(tex.Data, 256, int32(common.PaletteTransformsCount), 1, rl.UncompressedR8g8b8a8)
-		tex.Texture = rl.LoadTextureFromImage(img)
+	//tex := common.PaletteTexture[l.Palette]
+	//if !tex.Init {
+	//	img := rl.NewImage(tex.Data, 256, int32(common.PaletteTransformsCount), 1, rl.UncompressedR8g8b8a8)
+	//	tex.Texture = rl.LoadTextureFromImage(img)
 
-		tex.Init = true
-	}
+	//	tex.Init = true
+	//}
 
-	posX, posY := l.GetPosition()
+	//posX, posY := l.GetPosition()
 
 	switch l.HAlign {
 	case LabelAlignCenter:
-		posX -= int(l.texture.Width / 2)
+		//posX -= int(l.texture.Width / 2)
 	case LabelAlignEnd:
-		posX -= int(l.texture.Width)
+		//posX -= int(l.texture.Width)
 	}
 
 	switch l.VAlign {
 	case LabelAlignCenter:
-		posY -= int(l.texture.Height / 2)
+		//posY -= int(l.texture.Height / 2)
 	case LabelAlignEnd:
-		posY -= int(l.texture.Height)
+		//posY -= int(l.texture.Height)
 	}
 
 	l.BlendModeProvider.SetBlendMode(l.BlendMode)
-	rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
-	rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(l.color+common.PaletteTextShiftOffset) / float32(common.PaletteTransformsCount-1)}, rl.ShaderUniformFloat)
-	rl.DrawTexture(l.texture, int32(posX), int32(posY), rl.White)
+	//rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
+	//rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(l.color+common.PaletteTextShiftOffset) / float32(common.PaletteTransformsCount-1)}, rl.ShaderUniformFloat)
+	//rl.DrawTexture(l.texture, int32(posX), int32(posY), rl.White)
 
 }
 
@@ -253,13 +252,13 @@ func (l *Label) initializeTexture() {
 		}
 	}
 
-	img := rl.NewImage(pixels, int32(width), int32(height), 1, rl.UncompressedGrayscale)
+	//img := rl.NewImage(pixels, int32(width), int32(height), 1, rl.UncompressedGrayscale)
 
 	if !l.hasTexture {
 		l.hasTexture = true
 	} else {
-		rl.UnloadTexture(l.texture)
+		//rl.UnloadTexture(l.texture)
 	}
 
-	l.texture = rl.LoadTextureFromImage(img)
+	//l.texture = rl.LoadTextureFromImage(img)
 }

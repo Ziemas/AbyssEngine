@@ -1,14 +1,13 @@
-#version 330
+#version 330 core
+layout (location = 0) in vec4 vertex; // <vec2 position, vec2 texCoords>
 
-in vec3 vertexPosition;
-in vec2 vertexTexCoord;
-in vec4 vertexColor;
-out vec2 fragTexCoord;
-out vec4 fragColor;
+out vec2 TexCoords;
 
-uniform mat4 mvp;
-void main() {
-  fragTexCoord = vertexTexCoord;
-  fragColor = vertexColor;
-  gl_Position = mvp * vec4(vertexPosition, 1.0);
+uniform mat4 model;
+uniform mat4 projection;
+
+void main()
+{
+    TexCoords = vertex.zw;
+    gl_Position = projection * model * vec4(vertex.xy, 0.0, 1.0);
 }

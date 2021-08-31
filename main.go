@@ -8,7 +8,6 @@ import (
 	"path"
 
 	"github.com/OpenDiablo2/AbyssEngine/engine"
-	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/pkg/profile"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -44,17 +43,17 @@ func main() {
 	log.Info().Msg("Abyss Engine")
 	log.Debug().Msgf("Runtime Path: %s", runPath)
 
-	rl.SetTraceLog(4)
-	rl.SetTraceLogCallback(func(logLevel int, s string) {
-		[]func() *zerolog.Event{
-			log.Trace,
-			log.Debug,
-			log.Info,
-			log.Warn,
-			log.Error,
-			log.Fatal,
-		}[logLevel-1]().Msg(s)
-	})
+	//rl.SetTraceLog(4)
+	//rl.SetTraceLogCallback(func(logLevel int, s string) {
+	//	[]func() *zerolog.Event{
+	//		log.Trace,
+	//		log.Debug,
+	//		log.Info,
+	//		log.Warn,
+	//		log.Error,
+	//		log.Fatal,
+	//	}[logLevel-1]().Msg(s)
+	//})
 
 	engineConfig := engine.Configuration{
 		RootPath: runPath,

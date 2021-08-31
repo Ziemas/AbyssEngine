@@ -2,7 +2,6 @@ package engine
 
 import (
 	"fmt"
-	rl "github.com/gen2brain/raylib-go/raylib"
 	"io/ioutil"
 	"path"
 	"reflect"
@@ -199,11 +198,12 @@ func (e *Engine) luaLoader(l *lua.LState) int {
 
 func (e *Engine) luaFullscreen(l *lua.LState) int {
 	if l.GetTop() == 0 {
-		l.Push(lua.LBool(rl.IsWindowFullscreen()))
+		//l.Push(lua.LBool(rl.IsWindowFullscreen()))
 		return 1
 	}
 
-	isFullscreen := rl.IsWindowFullscreen()
+	//isFullscreen := rl.IsWindowFullscreen()
+	isFullscreen := true
 	doFullscreen := l.CheckBool(1)
 
 	if doFullscreen && !isFullscreen {
@@ -230,18 +230,18 @@ func (e *Engine) luaShowSystemCursor(l *lua.LState) int {
 	show := l.CheckBool(1)
 
 	if show {
-		rl.ShowCursor()
+		//rl.ShowCursor()
 		return 0
 	}
 
-	rl.HideCursor()
+	//rl.HideCursor()
 	return 0
 }
 
 func (e *Engine) luaSetTargetFps(l *lua.LState) int {
-	fps := l.CheckNumber(1)
+	//fps := l.CheckNumber(1)
 
-	rl.SetTargetFPS(int32(fps))
+	//rl.SetTargetFPS(int32(fps))
 
 	return 0
 }

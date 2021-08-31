@@ -2,7 +2,6 @@ package common
 
 import (
 	"errors"
-	rl "github.com/gen2brain/raylib-go/raylib"
 	"strings"
 )
 
@@ -17,13 +16,13 @@ const (
 	BlendModeSubtractColors
 )
 
-var BlendModeLookup = map[BlendMode]rl.BlendMode{
-	BlendModeAlpha:          rl.BlendAlpha,
-	BlendModeAdditive:       rl.BlendAdditive,
-	BlendModeMultiplied:     rl.BlendMultiplied,
-	BlendModeAddColors:      rl.BlendAddColors,
-	BlendModeSubtractColors: rl.BlendSubtractColors,
-}
+//var BlendModeLookup = map[BlendMode]rl.BlendMode{
+//	BlendModeAlpha:          rl.BlendAlpha,
+//	BlendModeAdditive:       rl.BlendAdditive,
+//	BlendModeMultiplied:     rl.BlendMultiplied,
+//	BlendModeAddColors:      rl.BlendAddColors,
+//	BlendModeSubtractColors: rl.BlendSubtractColors,
+//}
 
 type BlendModeProvider interface {
 	SetBlendMode(mode BlendMode)

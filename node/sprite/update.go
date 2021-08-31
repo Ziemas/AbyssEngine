@@ -1,14 +1,14 @@
 package sprite
 
-import rl "github.com/gen2brain/raylib-go/raylib"
-
 func (s *Sprite) update(elapsed float64) {
 	if s.onMouseButtonUp != nil || s.onMouseButtonDown != nil || s.onMouseOver != nil || s.onMouseLeave != nil {
-		mx, my := s.mousePosProvider.GetMousePosition()
-		posX, posY := s.GetPosition()
-		mouseIsOver := mx >= posX && my >= posY && mx < (posX+int(s.textures[s.CurrentFrame].Width)) && my < (posY+int(s.textures[s.CurrentFrame].Height))
+		//mx, my := s.mousePosProvider.GetMousePosition()
+		//posX, posY := s.GetPosition()
+		//mouseIsOver := mx >= posX && my >= posY && mx < (posX+int(s.textures[s.CurrentFrame].Width)) && my < (posY+int(s.textures[s.CurrentFrame].Height))
+		mouseIsOver := false
 
-		if rl.IsMouseButtonDown(rl.MouseLeftButton) {
+		//if rl.IsMouseButtonDown(rl.MouseLeftButton) {
+		if false {
 			if !s.isPressed {
 				if s.canPress && mouseIsOver {
 

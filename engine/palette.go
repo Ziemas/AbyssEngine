@@ -34,11 +34,21 @@ func (e *Engine) loadPalette(name string, path string) error {
 	colors := make([]uint8, 0)
 	colors = append(colors, palToSlice(pal.BasePalette)...)
 
+	colors = append(colors, transformToSlice(pal.BasePalette, pal.SelectedUnitShift)...)
+
 	common.PaletteTextShiftOffset = len(colors)/(256*4)
 
 	for idx := range pal.TextColorShifts {
 		colors = append(colors, transformToSlice(pal.BasePalette, pal.TextColorShifts[idx])...)
 	}
+
+	for idx := range pal.HueVariations {
+		colors = append(colors, transformToSlice(pal.BasePalette, pal.HueVariations[idx])...)
+	}
+
+	colors = append(colors, transformToSlice(pal.BasePalette, pal.RedTones)...)
+	colors = append(colors, transformToSlice(pal.BasePalette, pal.BlueTones)...)
+	colors = append(colors, transformToSlice(pal.BasePalette, pal.GreenTones)...)
 
 	common.PaletteTransformsCount = len(colors)/(256*4)
 

@@ -14,5 +14,8 @@ var AbyssIcon []byte
 //go:embed shaders/palette.fs
 var PaletteFragmentShader string
 
+//go:embed shaders/standard.fs
+var StandardFragmentShader string
+
 //go:embed shaders/standard.vs
 var StandardVertexShader string

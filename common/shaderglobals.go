@@ -1,16 +1,19 @@
 package common
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	ren "github.com/OpenDiablo2/AbyssEngine/renderer"
+)
 
 type PalTex struct {
-	Texture rl.Texture2D
+	Texture ren.Texture
 	Data    []byte
 	Init    bool
 }
 
 //TODO: Yeah yeah, move this out
 var (
-	PaletteShader          rl.Shader
+	StandardShader         ren.Shader
+	PaletteShader          ren.Shader
 	PaletteShaderLoc       int32
 	PaletteShaderOffsetLoc int32
 	PaletteTexture         map[string]*PalTex

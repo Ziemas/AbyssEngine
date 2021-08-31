@@ -2,7 +2,7 @@ package sprite
 
 import (
 	"github.com/OpenDiablo2/AbyssEngine/common"
-	rl "github.com/gen2brain/raylib-go/raylib"
+	ren "github.com/OpenDiablo2/AbyssEngine/renderer"
 )
 
 func (s *Sprite) render() {
@@ -12,8 +12,9 @@ func (s *Sprite) render() {
 
 	tex := common.PaletteTexture[s.palette]
 	if !tex.Init {
-		img := rl.NewImage(tex.Data, 256, int32(common.PaletteTransformsCount), 1, rl.UncompressedR8g8b8a8)
-		tex.Texture = rl.LoadTextureFromImage(img)
+		//img := rl.NewImage(tex.Data, 256, int32(common.PaletteTransformsCount), 1, rl.UncompressedR8g8b8a8)
+		//tex.Texture = rl.LoadTextureFromImage(img)
+		tex.Texture = ren.NewTextureRGBABytes(tex.Data, 256, common.PaletteTransformsCount)
 
 		tex.Init = true
 	}
@@ -28,10 +29,13 @@ func (s *Sprite) render() {
 
 	posY += s.Sequences.FrameOffsetY(s.CurrentSequence(), s.CurrentFrame)
 
-	rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
-	rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(s.paletteShift)}, rl.ShaderUniformFloat)
+	//rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
+	//rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(s.paletteShift) / float32(common.PaletteTransformsCount-1)}, rl.ShaderUniformFloat)
+	//ren.SetShaderValuei(common.PaletteShaderLoc, int32(tex.Texture.ID))
+	ren.SetShaderValueF(common.PaletteShaderOffsetLoc, float32(s.paletteShift)/float32(common.PaletteTransformsCount-1))
 	s.blendModeProvider.SetBlendMode(s.blendMode)
-	rl.DrawTexture(s.textures[s.CurrentFrame], int32(posX), int32(posY), rl.White)
+	//rl.DrawTexture(s.textures[s.CurrentFrame], int32(posX), int32(posY), rl.White)
+	ren.DrawTextureP(s.textures[s.CurrentFrame], posX, posY, tex.Texture, common.PaletteShaderLoc)
 
 }
 
@@ -68,7 +72,8 @@ func (s *Sprite) initializeTexture() {
 		targetStartY += s.Sequences.FrameHeight(s.CurrentSequence(), cellOffsetY, 1, 1)
 	}
 
-	img := rl.NewImage(pixels, int32(width), int32(height), 1, rl.UncompressedGrayscale)
+	//img := rl.NewImage(pixels, int32(width), int32(height), 1, rl.UncompressedGrayscale)
 
-	s.textures[s.CurrentFrame] = rl.LoadTextureFromImage(img)
+	//s.textures[s.CurrentFrame] = rl.LoadTextureFromImage(img)
+	s.textures[s.CurrentFrame] = ren.NewTextureIndexed(pixels, width, height)
 }

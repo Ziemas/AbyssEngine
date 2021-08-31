@@ -8,9 +8,9 @@ import (
 
 	"github.com/OpenDiablo2/AbyssEngine/common"
 	"github.com/OpenDiablo2/AbyssEngine/node"
+	ren "github.com/OpenDiablo2/AbyssEngine/renderer"
 	dc6 "github.com/OpenDiablo2/dc6/pkg"
 	dcc "github.com/OpenDiablo2/dcc/pkg"
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Sprite struct {
@@ -28,7 +28,8 @@ type Sprite struct {
 	isPressed         bool
 	isMouseOver       bool
 	canPress          bool
-	textures          []rl.Texture2D
+	//textures          []rl.Texture2D
+	textures          []ren.Texture
 	lastFrameTime     float64
 	playedCount       int
 	playMode          playMode
@@ -58,22 +59,23 @@ func New(loaderProvider common.LoaderProvider, mousePosProvider common.MousePosi
 		CurrentFrame:      0,
 		CellSizeX:         1,
 		CellSizeY:         1,
-		textures:          make([]rl.Texture2D, 0),
-		isPressed:         false,
-		isMouseOver:       false,
-		canPress:          true,
-		playMode:          playModePause,
-		playLength:        defaultPlayLength,
-		playedCount:       0,
-		lastFrameTime:     0,
-		paletteShift:      0,
-		bottomOrigin:      false,
-		blendMode:         common.BlendModeNone,
-		subStartingFrame:  0,
-		subEndingFrame:    0,
-		hasSubLoop:        false,
-		playLoop:          true,
-		palette:           palette,
+		//textures:          make([]rl.Texture2D, 0),
+		textures:          make([]ren.Texture, 0),
+		isPressed:        false,
+		isMouseOver:      false,
+		canPress:         true,
+		playMode:         playModePause,
+		playLength:       defaultPlayLength,
+		playedCount:      0,
+		lastFrameTime:    0,
+		paletteShift:     0,
+		bottomOrigin:     false,
+		blendMode:        common.BlendModeNone,
+		subStartingFrame: 0,
+		subEndingFrame:   0,
+		hasSubLoop:       false,
+		playLoop:         true,
+		palette:          palette,
 	}
 
 	result.RenderCallback = result.render
@@ -128,7 +130,8 @@ func New(loaderProvider common.LoaderProvider, mousePosProvider common.MousePosi
 		return nil, errors.New("unsupported file format")
 	}
 
-	result.textures = make([]rl.Texture2D, result.Sequences.FrameCount(result.CurrentSequence()))
+	//result.textures = make([]rl.Texture2D, result.Sequences.FrameCount(result.CurrentSequence()))
+	result.textures = make([]ren.Texture, result.Sequences.FrameCount(result.CurrentSequence()))
 	return result, nil
 }
 
@@ -141,12 +144,12 @@ func (s *Sprite) SetSequence(seqId int) {
 		return
 	}
 
-	for texIdx := range s.textures {
-		rl.UnloadTexture(s.textures[texIdx])
-	}
+	//for texIdx := range s.textures {
+	//	rl.UnloadTexture(s.textures[texIdx])
+	//}
 
 	s.currentSequence = seqId
-	s.textures = make([]rl.Texture2D, s.Sequences.FrameCount(s.CurrentSequence()))
+	//s.textures = make([]rl.Texture2D, s.Sequences.FrameCount(s.CurrentSequence()))
 }
 
 func (s *Sprite) setPalette(palette string) {
@@ -157,8 +160,8 @@ func (s *Sprite) Destroy() {
 	s.ShouldRemove = true
 	s.Active = false
 
-	for idx := range s.textures {
-		rl.UnloadTexture(s.textures[idx])
-	}
+	//for idx := range s.textures {
+	//	rl.UnloadTexture(s.textures[idx])
+	//}
 
 }
