@@ -6,20 +6,22 @@ import (
 	"strings"
 )
 
+const (
+	UniformModelLoc      = 1
+	UniformProjectionLoc = 2
+	UniformImageLoc      = 3
+
+	UniformPaletteTexLoc    = 4
+	UniformPaletteOffsetLoc = 5
+)
+
 type Shader struct {
 	id            uint32
-	modelUni      uint32
-	projectionUni uint32
 }
 
 func BeginShader(s Shader) {
 	gl.UseProgram(s.id)
-
-	// Track these so we can use them without mucking about with useprogram
-	curModelUni = s.modelUni
-	curProjUni = s.projectionUni
-
-	gl.UniformMatrix4fv(int32(curProjUni), 1, false, &projection[0])
+	gl.UniformMatrix4fv(int32(UniformProjectionLoc), 1, false, &projection[0])
 }
 
 func EndShader() {
@@ -55,8 +57,6 @@ func NewProgram(vertexShaderSrc, fragmentShaderSrc string) Shader {
 	gl.DeleteShader(fragmentShader)
 
 	s := Shader{id: program}
-	s.modelUni = uint32(GetShaderLocation(s, "model"))
-	s.projectionUni = uint32(GetShaderLocation(s, "projection"))
 	return s
 }
 

@@ -44,10 +44,6 @@ var (
 	quadVAO    uint32
 	vbo        uint32
 
-	// Our private uniforms for the renderer
-	curModelUni uint32
-	curProjUni  uint32
-
 	verts = []float32{
 		0.0, 1.0, 0.0, 1.0,
 		1.0, 0.0, 1.0, 0.0,
