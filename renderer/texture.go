@@ -14,9 +14,9 @@ type Texture struct {
 }
 
 func DrawTextureP(texture Texture, posX, posY int, t Texture, i int32) {
-	model := mgl32.Ident4()
-	model = model.Add(mgl32.Translate3D(float32(posX), float32(posY), 0))
-	model = model.Mul4(mgl32.Scale3D(float32(texture.Width), float32(texture.Height), 1.0))
+	model := mgl32.Ident4().
+		Mul4(mgl32.Translate3D(float32(posX), float32(posY), 0)).
+		Mul4(mgl32.Scale3D(float32(texture.Width), float32(texture.Height), 0.0))
 
 	gl.UniformMatrix4fv(int32(curModelUni), 1, false, &model[0])
 
@@ -35,9 +35,10 @@ func DrawTextureP(texture Texture, posX, posY int, t Texture, i int32) {
 }
 
 func DrawTexture(texture Texture, posX, posY int) {
-	model := mgl32.Ident4()
-	model = model.Add(mgl32.Translate3D(float32(posX), float32(posY), 0))
-	model = model.Mul4(mgl32.Scale3D(float32(texture.Width), float32(texture.Height), 1.0))
+
+	model := mgl32.Ident4().
+		Mul4(mgl32.Translate3D(float32(posX), float32(posY), 0)).
+		Mul4(mgl32.Scale3D(float32(texture.Width), float32(texture.Height), 0.0))
 
 	gl.UniformMatrix4fv(int32(curModelUni), 1, false, &model[0])
 
