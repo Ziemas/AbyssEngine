@@ -14,8 +14,6 @@ type PalTex struct {
 var (
 	StandardShader         ren.Shader
 	PaletteShader          ren.Shader
-	PaletteShaderLoc       int32
-	PaletteShaderOffsetLoc int32
 	PaletteTexture         map[string]*PalTex
 	PaletteTextShiftOffset int
 	PaletteTransformsCount int

@@ -57,19 +57,6 @@ var (
 	Width, Height int
 )
 
-//func New(window *glfw.Window) *Renderer {
-//	ren := Renderer{
-//		window: window,
-//	}
-//
-//	err := gl.Init()
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	return &ren
-//}
-
 func Init() *glfw.Window {
 	log.Info().Msgf("Initialising OpenGL")
 

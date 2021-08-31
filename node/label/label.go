@@ -165,8 +165,8 @@ func (l *Label) render() {
 	//rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
 	//rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(l.color+common.PaletteTextShiftOffset) / float32(common.PaletteTransformsCount-1)}, rl.ShaderUniformFloat)
 	//rl.DrawTexture(l.texture, int32(posX), int32(posY), rl.White)
-	ren.SetShaderValueF(common.PaletteShaderOffsetLoc, float32(l.color+common.PaletteTextShiftOffset)/float32(common.PaletteTransformsCount-1))
-	ren.DrawTextureP(l.texture, posX, posY, tex.Texture, common.PaletteShaderLoc)
+	ren.SetShaderValueF(ren.UniformPaletteOffsetLoc, float32(l.color+common.PaletteTextShiftOffset)/float32(common.PaletteTransformsCount-1))
+	ren.DrawTextureP(l.texture, posX, posY, tex.Texture)
 
 }
 

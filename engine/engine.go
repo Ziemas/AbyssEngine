@@ -120,8 +120,6 @@ func New(config Configuration) *Engine {
 
 	common.StandardShader = ren.NewProgram(media.StandardVertexShader, media.StandardFragmentShader)
 	common.PaletteShader = ren.NewProgram(media.StandardVertexShader, media.PaletteFragmentShader)
-	common.PaletteShaderLoc = ren.GetShaderLocation(common.PaletteShader, "paletteTex")
-	common.PaletteShaderOffsetLoc = ren.GetShaderLocation(common.PaletteShader, "paletteOffset")
 	return result
 }
 
@@ -215,9 +213,7 @@ func (e *Engine) showBootSplash() {
 	//rl.DrawTexture(e.bootLogo, int32(rl.GetScreenWidth()/3)-(e.bootLogo.Width/2),
 	//	int32(rl.GetScreenHeight()/2)-(e.bootLogo.Height/2), rl.White)
 
-	ren.DrawTexture(e.bootLogo, (ren.GetScreenWidth()/3)-(e.bootLogo.Width/2),
-		(ren.GetScreenHeight()/2)-(e.bootLogo.Height/2))
-	//ren.DrawTexture(e.bootLogo, (ren.GetScreenWidth()/2)+(e.bootLogo.Width), ren.GetScreenHeight()/2+(e.bootLogo.Height))
+	ren.DrawTexture(e.bootLogo, (ren.GetScreenWidth()/3)-(e.bootLogo.Width/2),	(ren.GetScreenHeight()/2)-(e.bootLogo.Height/2))
 
 	//textX := float32(rl.GetScreenWidth()) / 2
 	//textY := float32(rl.GetScreenHeight()/2) - 20

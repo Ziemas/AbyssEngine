@@ -1,20 +1,15 @@
-#version 330
+#version 330 core
 #extension GL_ARB_explicit_uniform_location : require
-// Input frag attributes
+#extension GL_ARB_shading_language_420pack: enable
 in vec2 TexCoords;
 
-// Init uniform values
-layout (location = 3) uniform sampler2D image;
-layout (location = 4) uniform sampler2D paletteTex;
+layout (binding = 0) uniform sampler2D image;
+layout (binding = 1) uniform sampler2D paletteTex;
 layout (location = 5) uniform float paletteOffset;
 
 out vec4 color;
 
 void main() {
   vec4 index = texture(image, TexCoords);
-  if (index.x < (1.0 / 255)) {
-      discard;
-  }
-
   color = texture(paletteTex, vec2(index.x, paletteOffset));
 }

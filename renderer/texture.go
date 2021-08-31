@@ -13,7 +13,7 @@ type Texture struct {
 	Width, Height int
 }
 
-func DrawTextureP(texture Texture, posX, posY int, t Texture, i int32) {
+func DrawTextureP(texture Texture, posX, posY int, palette Texture) {
 	model := mgl32.Ident4().
 		Mul4(mgl32.Translate3D(float32(posX), float32(posY), 0)).
 		Mul4(mgl32.Scale3D(float32(texture.Width), float32(texture.Height), 0.0))
@@ -23,10 +23,8 @@ func DrawTextureP(texture Texture, posX, posY int, t Texture, i int32) {
 	gl.ActiveTexture(gl.TEXTURE0)
 	texture.Bind()
 
-	SetShaderValuei(int32(i), int32(1))
-
 	gl.ActiveTexture(uint32(gl.TEXTURE1))
-	gl.BindTexture(gl.TEXTURE_2D, t.ID)
+	palette.Bind()
 
 	gl.BindVertexArray(quadVAO)
 	gl.DrawArrays(gl.TRIANGLES, 0, 6)

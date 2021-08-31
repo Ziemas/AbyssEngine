@@ -32,10 +32,10 @@ func (s *Sprite) render() {
 	//rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
 	//rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(s.paletteShift) / float32(common.PaletteTransformsCount-1)}, rl.ShaderUniformFloat)
 	//ren.SetShaderValuei(common.PaletteShaderLoc, int32(tex.Texture.ID))
-	ren.SetShaderValueF(common.PaletteShaderOffsetLoc, float32(s.paletteShift)/float32(common.PaletteTransformsCount-1))
+	ren.SetShaderValueF(ren.UniformPaletteOffsetLoc, float32(s.paletteShift)/float32(common.PaletteTransformsCount-1))
 	s.blendModeProvider.SetBlendMode(s.blendMode)
 	//rl.DrawTexture(s.textures[s.CurrentFrame], int32(posX), int32(posY), rl.White)
-	ren.DrawTextureP(s.textures[s.CurrentFrame], posX, posY, tex.Texture, common.PaletteShaderLoc)
+	ren.DrawTextureP(s.textures[s.CurrentFrame], posX, posY, tex.Texture)
 
 }
 

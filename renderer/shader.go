@@ -13,10 +13,13 @@ const (
 
 	UniformPaletteTexLoc    = 4
 	UniformPaletteOffsetLoc = 5
+
+	TextureImageBind   = 0
+	TexturePaletteBind = 1
 )
 
 type Shader struct {
-	id            uint32
+	id uint32
 }
 
 func BeginShader(s Shader) {
