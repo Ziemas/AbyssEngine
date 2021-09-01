@@ -3,6 +3,7 @@ package engine
 import (
 	"bytes"
 	"fmt"
+	"github.com/OpenDiablo2/AbyssEngine/common"
 	"github.com/OpenDiablo2/AbyssEngine/loader"
 	"github.com/OpenDiablo2/AbyssEngine/loader/filesystemloader"
 	"github.com/OpenDiablo2/AbyssEngine/media"
@@ -140,6 +141,10 @@ func (e *Engine) Run() {
 }
 
 func (e *Engine) showGame() {
+
+	common.NodeStateMutex.Lock()
+	defer common.NodeStateMutex.Unlock()
+
 	e.rootNode.Render()
 	if e.cursorSprite != nil {
 		e.cursorSprite.Render()

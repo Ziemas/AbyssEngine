@@ -148,7 +148,6 @@ func (s *Sprite) setPalette(palette string) {
 }
 
 func (s *Sprite) Destroy() {
-	s.ShouldRemove = true
 	s.Active = false
 
 	for idx := range s.textures {

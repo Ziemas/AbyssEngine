@@ -12,9 +12,27 @@ var LuaTypeExport = common.LuaTypeExport{
 	Name:            luaTypeExportName,
 	ConstructorFunc: luaNewNode,
 	Methods: map[string]lua.LGFunction{
-		"appendChild": luaAppendChild,
-		"removeChild": luaRemoveChild,
+		"appendChild":       luaAppendChild,
+		"removeChild":       luaRemoveChild,
+		"removeAllChildren": luaRemoveAllChildren,
 	},
+}
+
+func luaRemoveAllChildren(l *lua.LState) int {
+	if l.GetTop() != 1 {
+		l.ArgError(1, "no arguments expected")
+		return 0
+	}
+
+	self, ok := l.ToUserData(1).Value.(*Node)
+
+	if !ok {
+		l.RaiseError("failed to convert")
+		return 0
+	}
+
+	self.RemoveAllChildren()
+	return 0
 }
 
 func luaNewNode(l *lua.LState) int {

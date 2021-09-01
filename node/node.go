@@ -2,7 +2,7 @@ package node
 
 import (
 	"errors"
-
+	"github.com/OpenDiablo2/AbyssEngine/common"
 	"github.com/rs/zerolog/log"
 
 	"github.com/segmentio/ksuid"
@@ -10,7 +10,6 @@ import (
 
 type Node struct {
 	Id             ksuid.KSUID
-	ShouldRemove   bool
 	Parent         *Node
 	Children       []*Node
 	Active         bool
@@ -50,6 +49,9 @@ func (e *Node) AddChild(entity *Node) error {
 		return errors.New("node already has a Parent")
 	}
 
+	common.NodeStateMutex.Lock()
+	defer common.NodeStateMutex.Unlock()
+
 	log.Trace().Msgf("added node %s to %s", entity.Id.String(), e.Id.String())
 
 	e.Children = append(e.Children, entity)
@@ -59,6 +61,9 @@ func (e *Node) AddChild(entity *Node) error {
 }
 
 func (e *Node) RemoveAllChildren() {
+	common.NodeStateMutex.Lock()
+	defer common.NodeStateMutex.Unlock()
+
 	for idx := range e.Children {
 		e.Children[idx].Parent = nil
 	}
@@ -69,6 +74,9 @@ func (e *Node) RemoveAllChildren() {
 }
 
 func (e *Node) RemoveChild(node *Node) {
+	common.NodeStateMutex.Lock()
+	defer common.NodeStateMutex.Unlock()
+
 	for idx := range e.Children {
 		if e.Children[idx] != node {
 			continue
@@ -84,6 +92,7 @@ func (e *Node) RemoveChild(node *Node) {
 
 		return
 	}
+
 }
 
 func (e *Node) FindChild(id ksuid.KSUID) *Node {
@@ -108,6 +117,7 @@ func (e *Node) FindChild(id ksuid.KSUID) *Node {
 }
 
 func (e *Node) Render() {
+
 	if !e.Visible || !e.Active {
 		return
 	}
@@ -134,25 +144,11 @@ func (e *Node) Update(elapsed float64) {
 		e.UpdateCallback(elapsed)
 	}
 
-	toRemove := make([]*Node, 0)
 	for idx := range e.Children {
 		if !e.Children[idx].Active {
-			if e.Children[idx].ShouldRemove {
-				toRemove = append(toRemove, e.Children[idx])
-			}
-
 			continue
 		}
 
 		e.Children[idx].Update(elapsed)
-
-		if e.Children[idx].ShouldRemove {
-			toRemove = append(toRemove, e.Children[idx])
-		}
 	}
-
-	for idx := range toRemove {
-		e.RemoveChild(toRemove[idx])
-	}
-
 }
