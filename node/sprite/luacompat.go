@@ -1,7 +1,10 @@
 package sprite
 
 import (
+	"errors"
 	"fmt"
+	"github.com/OpenDiablo2/AbyssEngine/providers/renderprovider"
+	"strings"
 
 	"github.com/OpenDiablo2/AbyssEngine/common"
 	lua "github.com/yuin/gopher-lua"
@@ -32,6 +35,44 @@ var LuaTypeExport = common.LuaTypeExport{
 	},
 }
 
+func BlendModeToString(mode renderprovider.BlendMode) string {
+	switch mode {
+	case renderprovider.BlendModeNone:
+		return ""
+	case renderprovider.BlendModeAlpha:
+		return "alpha"
+	case renderprovider.BlendModeAdditive:
+		return "add"
+	case renderprovider.BlendModeMultiplied:
+		return "multiply"
+	case renderprovider.BlendModeAddColors:
+		return "addcolors"
+	case renderprovider.BlendModeSubtractColors:
+		return "subcolors"
+	default:
+		return ""
+	}
+}
+
+func StringToBlendMode(mode string) (renderprovider.BlendMode, error) {
+	switch strings.ToLower(mode) {
+	case "":
+		return renderprovider.BlendModeNone, nil
+	case "alpha":
+		return renderprovider.BlendModeAlpha, nil
+	case "add":
+		return renderprovider.BlendModeAdditive, nil
+	case "multiply":
+		return renderprovider.BlendModeMultiplied, nil
+	case "addcolors":
+		return renderprovider.BlendModeAddColors, nil
+	case "subcolors":
+		return renderprovider.BlendModeSubtractColors, nil
+	default:
+		return -1, errors.New("invalid blend mode")
+	}
+}
+
 func luaGetSetBottomOrigin(l *lua.LState) int {
 	sprite, err := FromLua(l.ToUserData(1))
 
@@ -60,11 +101,11 @@ func luaGetSetBlendMode(l *lua.LState) int {
 	}
 
 	if l.GetTop() == 1 {
-		l.Push(lua.LString(common.BlendModeToString(sprite.blendMode)))
+		l.Push(lua.LString(BlendModeToString(sprite.blendMode)))
 		return 1
 	}
 
-	newMode, err := common.StringToBlendMode(l.CheckString(2))
+	newMode, err := StringToBlendMode(l.CheckString(2))
 
 	if err != nil {
 		l.RaiseError(err.Error())
@@ -108,13 +149,15 @@ func luaGetSetMouseOverHandler(l *lua.LState) int {
 
 	luaFunc := l.CheckFunction(2)
 	sprite.onMouseOver = func() {
-		if err := l.CallByParam(lua.P{
-			Fn:      luaFunc,
-			NRet:    1,
-			Protect: true,
-		}, sprite.ToLua(l)); err != nil {
-			panic(err)
-		}
+		go func() {
+			if err := l.CallByParam(lua.P{
+				Fn:      luaFunc,
+				NRet:    1,
+				Protect: true,
+			}, sprite.ToLua(l)); err != nil {
+				panic(err)
+			}
+		}()
 	}
 
 	return 0
@@ -139,13 +182,15 @@ func luaGetSetMouseLeaveHandler(l *lua.LState) int {
 
 	luaFunc := l.CheckFunction(2)
 	sprite.onMouseLeave = func() {
-		if err := l.CallByParam(lua.P{
-			Fn:      luaFunc,
-			NRet:    1,
-			Protect: true,
-		}, sprite.ToLua(l)); err != nil {
-			panic(err)
-		}
+		go func() {
+			if err := l.CallByParam(lua.P{
+				Fn:      luaFunc,
+				NRet:    1,
+				Protect: true,
+			}, sprite.ToLua(l)); err != nil {
+				panic(err)
+			}
+		}()
 	}
 
 	return 0
@@ -183,13 +228,15 @@ func luaGetSetMouseButtonUpHandler(l *lua.LState) int {
 
 	luaFunc := l.CheckFunction(2)
 	sprite.onMouseButtonUp = func() {
-		if err := l.CallByParam(lua.P{
-			Fn:      luaFunc,
-			NRet:    1,
-			Protect: true,
-		}, sprite.ToLua(l)); err != nil {
-			panic(err)
-		}
+		go func() {
+			if err := l.CallByParam(lua.P{
+				Fn:      luaFunc,
+				NRet:    1,
+				Protect: true,
+			}, sprite.ToLua(l)); err != nil {
+				panic(err)
+			}
+		}()
 	}
 
 	return 0
@@ -367,13 +414,15 @@ func luaGetSetMouseButtonDownHandler(l *lua.LState) int {
 
 	luaFunc := l.CheckFunction(2)
 	sprite.onMouseButtonDown = func() {
-		if err := l.CallByParam(lua.P{
-			Fn:      luaFunc,
-			NRet:    1,
-			Protect: true,
-		}, sprite.ToLua(l)); err != nil {
-			panic(err)
-		}
+		go func() {
+			if err := l.CallByParam(lua.P{
+				Fn:      luaFunc,
+				NRet:    1,
+				Protect: true,
+			}, sprite.ToLua(l)); err != nil {
+				panic(err)
+			}
+		}()
 	}
 
 	return 0

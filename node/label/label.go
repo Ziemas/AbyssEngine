@@ -1,13 +1,12 @@
 package label
 
 import (
-	bytes2 "bytes"
+	bytes "bytes"
 	"errors"
+	"github.com/OpenDiablo2/AbyssEngine/providers/renderprovider"
 	"image"
 	"io"
 	"strings"
-
-	rl "github.com/gen2brain/raylib-go/raylib"
 
 	"github.com/OpenDiablo2/AbyssEngine/common"
 	"github.com/OpenDiablo2/AbyssEngine/node"
@@ -52,39 +51,38 @@ func StringToLabelAlign(s string) (LabelAlign, error) {
 type Label struct {
 	*node.Node
 
-	initialized       bool
-	hasTexture        bool
-	texture           rl.Texture2D
-	FontTable         *tblfont.FontTable
-	FontGfx           common.SequenceProvider
-	BlendModeProvider common.BlendModeProvider
-	Palette           string
-	Caption           string
-	BlendMode         common.BlendMode
-	color             int
-	HAlign            LabelAlign
-	VAlign            LabelAlign
+	initialized    bool
+	hasTexture     bool
+	renderProvider renderprovider.RenderProvider
+	texture        renderprovider.Texture
+	FontTable      *tblfont.FontTable
+	FontGfx        common.SequenceProvider
+	Palette        string
+	Caption        string
+	BlendMode      renderprovider.BlendMode
+	color          int
+	HAlign         LabelAlign
+	VAlign         LabelAlign
 }
 
-func New(loaderProvider common.LoaderProvider, blendModeProvider common.BlendModeProvider, fontPath, palette string) (*Label, error) {
+func New(
+	loaderProvider common.LoaderProvider,
+	renderProvider renderprovider.RenderProvider,
+	fontPath, palette string) (*Label, error) {
 	result := &Label{
-		Node:              node.New(),
-		BlendModeProvider: blendModeProvider,
-		initialized:       false,
-		HAlign:            LabelAlignStart,
-		VAlign:            LabelAlignStart,
-		BlendMode:         common.BlendModeNone,
-		color:             7,
+		Node:           node.New(),
+		renderProvider: renderProvider,
+		initialized:    false,
+		HAlign:         LabelAlignStart,
+		VAlign:         LabelAlignStart,
+		BlendMode:      renderprovider.BlendModeNone,
+		color:          7,
 	}
 
-	_, ok := common.PaletteTexture[palette]
-	if !ok {
-		return nil, errors.New("sprite loaded with non-existent palette")
-	}
 	result.Palette = palette
 
 	fontTableStream, err := loaderProvider.Load(fontPath + ".tbl")
-	defer fontTableStream.Close()
+	defer func() { _ = fontTableStream.Close() }()
 
 	if err != nil {
 		return nil, err
@@ -92,7 +90,7 @@ func New(loaderProvider common.LoaderProvider, blendModeProvider common.BlendMod
 
 	// hack: mpq block stream is bugged
 	fontTableData, _ := io.ReadAll(fontTableStream)
-	fontTable, err := tblfont.Load(bytes2.NewReader(fontTableData))
+	fontTable, err := tblfont.Load(bytes.NewReader(fontTableData))
 
 	if err != nil {
 		return nil, err
@@ -101,7 +99,7 @@ func New(loaderProvider common.LoaderProvider, blendModeProvider common.BlendMod
 	result.FontTable = fontTable
 
 	fontSpriteStream, err := loaderProvider.Load(fontPath + ".dc6")
-	defer fontSpriteStream.Close()
+	defer func() { _ = fontSpriteStream.Close() }()
 
 	if err != nil {
 		return nil, err
@@ -128,34 +126,26 @@ func (l *Label) render() {
 		return
 	}
 
-	tex := common.PaletteTexture[l.Palette]
-	if !tex.Init {
-		img := rl.NewImage(tex.Data, 256, int32(common.PaletteTransformsCount), 1, rl.UncompressedR8g8b8a8)
-		tex.Texture = rl.LoadTextureFromImage(img)
-
-		tex.Init = true
-	}
-
 	posX, posY := l.GetPosition()
 
 	switch l.HAlign {
 	case LabelAlignCenter:
-		posX -= int(l.texture.Width / 2)
+		posX -= l.texture.Width() / 2
 	case LabelAlignEnd:
-		posX -= int(l.texture.Width)
+		posX -= l.texture.Width()
 	}
 
 	switch l.VAlign {
 	case LabelAlignCenter:
-		posY -= int(l.texture.Height / 2)
+		posY -= l.texture.Height() / 2
 	case LabelAlignEnd:
-		posY -= int(l.texture.Height)
+		posY -= l.texture.Height()
 	}
 
-	l.BlendModeProvider.SetBlendMode(l.BlendMode)
-	rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
-	rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(l.color+common.PaletteTextShiftOffset) / float32(common.PaletteTransformsCount-1)}, rl.ShaderUniformFloat)
-	rl.DrawTexture(l.texture, int32(posX), int32(posY), rl.White)
+	l.renderProvider.BeginBlendMode(l.BlendMode)
+
+	_ = l.renderProvider.DrawFontTexture(l.texture, posX, posY, l.Palette, l.color)
+	l.renderProvider.EndBlendMode()
 
 }
 
@@ -253,13 +243,13 @@ func (l *Label) initializeTexture() {
 		}
 	}
 
-	img := rl.NewImage(pixels, int32(width), int32(height), 1, rl.UncompressedGrayscale)
+	img, _ := l.renderProvider.NewImage(bytes.NewReader(pixels), width, height, renderprovider.ImageColorModeGrayscale)
 
 	if !l.hasTexture {
 		l.hasTexture = true
 	} else {
-		rl.UnloadTexture(l.texture)
+		_ = l.renderProvider.FreeTexture(l.texture)
 	}
 
-	l.texture = rl.LoadTextureFromImage(img)
+	l.texture, _ = l.renderProvider.LoadTextureFromImage(img)
 }

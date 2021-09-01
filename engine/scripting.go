@@ -2,7 +2,6 @@ package engine
 
 import (
 	"fmt"
-	rl "github.com/gen2brain/raylib-go/raylib"
 	"io/ioutil"
 	"path"
 	"reflect"
@@ -199,19 +198,11 @@ func (e *Engine) luaLoader(l *lua.LState) int {
 
 func (e *Engine) luaFullscreen(l *lua.LState) int {
 	if l.GetTop() == 0 {
-		l.Push(lua.LBool(rl.IsWindowFullscreen()))
+		l.Push(lua.LBool(false)) // TODO: Implement fullscreen
 		return 1
 	}
 
-	isFullscreen := rl.IsWindowFullscreen()
-	doFullscreen := l.CheckBool(1)
-
-	if doFullscreen && !isFullscreen {
-		e.toggleFullscreen = true
-	} else if !doFullscreen && isFullscreen {
-		e.toggleFullscreen = true
-	}
-
+	// TODO: Implement full screen mode
 	return 0
 }
 
@@ -229,19 +220,15 @@ func (e *Engine) luaShutdown(l *lua.LState) int {
 func (e *Engine) luaShowSystemCursor(l *lua.LState) int {
 	show := l.CheckBool(1)
 
-	if show {
-		rl.ShowCursor()
-		return 0
-	}
+	e.renderProvider.SetMouseVisible(show)
 
-	rl.HideCursor()
 	return 0
 }
 
 func (e *Engine) luaSetTargetFps(l *lua.LState) int {
 	fps := l.CheckNumber(1)
 
-	rl.SetTargetFPS(int32(fps))
+	e.renderProvider.SetTargetFPS(int(fps))
 
 	return 0
 }
@@ -458,7 +445,7 @@ func (e *Engine) luaLoadButton(l *lua.LState) int {
 		return 0
 	}
 
-	button, err := button.New(e.loader, e, e, *buttonLayout)
+	button, err := button.New(e.loader, e.renderProvider, e, *buttonLayout)
 
 	if err != nil {
 		l.RaiseError(err.Error())
@@ -483,7 +470,7 @@ func (e *Engine) luaLoadSprite(l *lua.LState) int {
 	filePath := l.CheckString(1)
 	palette := l.CheckString(2)
 
-	result, err := sprite.New(e.loader, e, e, filePath, palette)
+	result, err := sprite.New(e.loader, e, e.renderProvider, filePath, palette)
 
 	if err != nil {
 		l.RaiseError(err.Error())
@@ -505,7 +492,7 @@ func (e *Engine) luaSetCursor(l *lua.LState) int {
 		return 0
 	}
 
-	sprite, err := sprite.FromLua(l.ToUserData(1))
+	spr, err := sprite.FromLua(l.ToUserData(1))
 
 	if err != nil {
 		e.cursorSprite = nil
@@ -513,7 +500,7 @@ func (e *Engine) luaSetCursor(l *lua.LState) int {
 		return 0
 	}
 
-	e.cursorSprite = sprite
+	e.cursorSprite = spr
 	e.cursorOffset.X = l.CheckInt(2)
 	e.cursorOffset.Y = l.CheckInt(3)
 
@@ -563,7 +550,10 @@ func (e *Engine) luaLoadPalette(l *lua.LState) int {
 	palette := l.CheckString(1)
 	filePath := l.CheckString(2)
 
-	err := e.loadPalette(palette, filePath)
+	stream, _ := e.loader.Load(filePath)
+	defer func() { _ = stream.Close() }()
+
+	err := e.renderProvider.LoadPalette(palette, stream)
 
 	if err != nil {
 		l.RaiseError(err.Error())
@@ -582,7 +572,7 @@ func (e *Engine) luaLoadLabel(l *lua.LState) int {
 	fontPath := l.CheckString(1)
 	palette := l.CheckString(2)
 
-	result, err := label.New(e.loader, e, fontPath, palette)
+	result, err := label.New(e.loader, e.renderProvider, fontPath, palette)
 
 	if err != nil {
 		l.RaiseError(err.Error())

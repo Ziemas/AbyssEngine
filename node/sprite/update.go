@@ -1,14 +1,21 @@
 package sprite
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	"github.com/OpenDiablo2/AbyssEngine/providers/renderprovider"
+)
 
 func (s *Sprite) update(elapsed float64) {
+	if s.textures[s.CurrentFrame] == nil {
+		s.initializeTexture()
+	}
+
 	if s.onMouseButtonUp != nil || s.onMouseButtonDown != nil || s.onMouseOver != nil || s.onMouseLeave != nil {
 		mx, my := s.mousePosProvider.GetMousePosition()
 		posX, posY := s.GetPosition()
-		mouseIsOver := mx >= posX && my >= posY && mx < (posX+int(s.textures[s.CurrentFrame].Width)) && my < (posY+int(s.textures[s.CurrentFrame].Height))
 
-		if rl.IsMouseButtonDown(rl.MouseLeftButton) {
+		mouseIsOver := mx >= posX && my >= posY && mx < (posX+int(s.textures[s.CurrentFrame].Width())) && my < (posY+int(s.textures[s.CurrentFrame].Height()))
+
+		if s.renderProvider.IsMouseButtonPressed(renderprovider.MouseButtonLeft) {
 			if !s.isPressed {
 				if s.canPress && mouseIsOver {
 
@@ -50,7 +57,7 @@ func (s *Sprite) update(elapsed float64) {
 
 	s.animate(elapsed)
 
-	if s.textures[s.CurrentFrame].ID == 0 {
+	if s.textures[s.CurrentFrame] == nil {
 		s.initializeTexture()
 	}
 }

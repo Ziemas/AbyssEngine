@@ -1,21 +1,13 @@
 package sprite
 
 import (
-	"github.com/OpenDiablo2/AbyssEngine/common"
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"bytes"
+	"github.com/OpenDiablo2/AbyssEngine/providers/renderprovider"
 )
 
 func (s *Sprite) render() {
-	if s.textures[s.CurrentFrame].ID == 0 || !s.Visible || !s.Active {
+	if s.textures[s.CurrentFrame] == nil || !s.Visible || !s.Active {
 		return
-	}
-
-	tex := common.PaletteTexture[s.palette]
-	if !tex.Init {
-		img := rl.NewImage(tex.Data, 256, int32(common.PaletteTransformsCount), 1, rl.UncompressedR8g8b8a8)
-		tex.Texture = rl.LoadTextureFromImage(img)
-
-		tex.Init = true
 	}
 
 	posX, posY := s.GetPosition()
@@ -28,10 +20,9 @@ func (s *Sprite) render() {
 
 	posY += s.Sequences.FrameOffsetY(s.CurrentSequence(), s.CurrentFrame)
 
-	rl.SetShaderValueTexture(common.PaletteShader, common.PaletteShaderLoc, tex.Texture)
-	rl.SetShaderValue(common.PaletteShader, common.PaletteShaderOffsetLoc, []float32{float32(s.paletteShift)}, rl.ShaderUniformFloat)
-	s.blendModeProvider.SetBlendMode(s.blendMode)
-	rl.DrawTexture(s.textures[s.CurrentFrame], int32(posX), int32(posY), rl.White)
+	s.renderProvider.BeginBlendMode(s.blendMode)
+	_ = s.renderProvider.DrawTexture(s.textures[s.CurrentFrame], posX, posY, s.palette, s.paletteShift)
+	s.renderProvider.EndBlendMode()
 
 }
 
@@ -68,7 +59,7 @@ func (s *Sprite) initializeTexture() {
 		targetStartY += s.Sequences.FrameHeight(s.CurrentSequence(), cellOffsetY, 1, 1)
 	}
 
-	img := rl.NewImage(pixels, int32(width), int32(height), 1, rl.UncompressedGrayscale)
+	img, _ := s.renderProvider.NewImage(bytes.NewReader(pixels), width, height, renderprovider.ImageColorModeGrayscale)
 
-	s.textures[s.CurrentFrame] = rl.LoadTextureFromImage(img)
+	s.textures[s.CurrentFrame], _ = s.renderProvider.LoadTextureFromImage(img)
 }

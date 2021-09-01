@@ -6,6 +6,7 @@ import (
 	"github.com/OpenDiablo2/AbyssEngine/node/button/buttonlayout"
 	"github.com/OpenDiablo2/AbyssEngine/node/label"
 	"github.com/OpenDiablo2/AbyssEngine/node/sprite"
+	"github.com/OpenDiablo2/AbyssEngine/providers/renderprovider"
 )
 
 const (
@@ -27,8 +28,7 @@ type Button struct {
 	text         string
 }
 
-func New(loaderProvider common.LoaderProvider, mousePositionProvider common.MousePositionProvider,
-	blendModeProvider common.BlendModeProvider,
+func New(loaderProvider common.LoaderProvider, renderProvider renderprovider.RenderProvider, mousePositionProvider common.MousePositionProvider,
 	buttonLayout buttonlayout.ButtonLayout) (*Button, error) {
 	result := &Button{
 		Node:         node.New(),
@@ -43,14 +43,14 @@ func New(loaderProvider common.LoaderProvider, mousePositionProvider common.Mous
 
 	var err error
 
-	result.sprite, err = sprite.New(loaderProvider, mousePositionProvider, blendModeProvider,
+	result.sprite, err = sprite.New(loaderProvider, mousePositionProvider, renderProvider,
 		buttonLayout.ResourceName, buttonLayout.PaletteName)
 
 	if err != nil {
 		return nil, err
 	}
 
-	result.label, err = label.New(loaderProvider, blendModeProvider, buttonLayout.FontPath, buttonLayout.PaletteName)
+	result.label, err = label.New(loaderProvider, renderProvider, buttonLayout.FontPath, buttonLayout.PaletteName)
 
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func New(loaderProvider common.LoaderProvider, mousePositionProvider common.Mous
 	result.label.Y += buttonLayout.TextOffsetY
 	result.label.HAlign = label.LabelAlignCenter
 	result.label.VAlign = label.LabelAlignCenter
-	result.label.BlendMode = common.BlendModeMultiplied
+	result.label.BlendMode = renderprovider.BlendModeMultiplied
 
 	err = result.sprite.Node.AddChild(result.label.Node)
 

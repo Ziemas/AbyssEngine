@@ -2,6 +2,7 @@ package sprite
 
 import (
 	"errors"
+	"github.com/OpenDiablo2/AbyssEngine/providers/renderprovider"
 	"io/ioutil"
 	"path"
 	"strings"
@@ -10,7 +11,6 @@ import (
 	"github.com/OpenDiablo2/AbyssEngine/node"
 	dc6 "github.com/OpenDiablo2/dc6/pkg"
 	dcc "github.com/OpenDiablo2/dcc/pkg"
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Sprite struct {
@@ -18,7 +18,7 @@ type Sprite struct {
 
 	mousePosProvider  common.MousePositionProvider
 	Sequences         common.SequenceProvider
-	blendModeProvider common.BlendModeProvider
+	renderProvider    renderprovider.RenderProvider
 	palette           string
 	currentSequence   int
 	CurrentFrame      int
@@ -28,7 +28,7 @@ type Sprite struct {
 	isPressed         bool
 	isMouseOver       bool
 	canPress          bool
-	textures          []rl.Texture2D
+	textures          []renderprovider.Texture
 	lastFrameTime     float64
 	playedCount       int
 	playMode          playMode
@@ -38,7 +38,7 @@ type Sprite struct {
 	subEndingFrame    int
 	playLoop          bool
 	bottomOrigin      bool
-	blendMode         common.BlendMode
+	blendMode         renderprovider.BlendMode
 	paletteShift      int
 	onMouseButtonDown func()
 	onMouseButtonUp   func()
@@ -47,33 +47,32 @@ type Sprite struct {
 }
 
 func New(loaderProvider common.LoaderProvider, mousePosProvider common.MousePositionProvider,
-	blendModeProvider common.BlendModeProvider,
-	filePath, palette string) (*Sprite, error) {
+	renderProvider renderprovider.RenderProvider, filePath, palette string) (*Sprite, error) {
 	result := &Sprite{
-		Node:              node.New(),
-		mousePosProvider:  mousePosProvider,
-		blendModeProvider: blendModeProvider,
-		Visible:           true,
-		currentSequence:   0,
-		CurrentFrame:      0,
-		CellSizeX:         1,
-		CellSizeY:         1,
-		textures:          make([]rl.Texture2D, 0),
-		isPressed:         false,
-		isMouseOver:       false,
-		canPress:          true,
-		playMode:          playModePause,
-		playLength:        defaultPlayLength,
-		playedCount:       0,
-		lastFrameTime:     0,
-		paletteShift:      0,
-		bottomOrigin:      false,
-		blendMode:         common.BlendModeNone,
-		subStartingFrame:  0,
-		subEndingFrame:    0,
-		hasSubLoop:        false,
-		playLoop:          true,
-		palette:           palette,
+		Node:             node.New(),
+		mousePosProvider: mousePosProvider,
+		renderProvider:   renderProvider,
+		Visible:          true,
+		currentSequence:  0,
+		CurrentFrame:     0,
+		CellSizeX:        1,
+		CellSizeY:        1,
+		textures:         make([]renderprovider.Texture, 0),
+		isPressed:        false,
+		isMouseOver:      false,
+		canPress:         true,
+		playMode:         playModePause,
+		playLength:       defaultPlayLength,
+		playedCount:      0,
+		lastFrameTime:    0,
+		paletteShift:     0,
+		bottomOrigin:     false,
+		blendMode:        renderprovider.BlendModeNone,
+		subStartingFrame: 0,
+		subEndingFrame:   0,
+		hasSubLoop:       false,
+		playLoop:         true,
+		palette:          palette,
 	}
 
 	result.RenderCallback = result.render
@@ -82,15 +81,10 @@ func New(loaderProvider common.LoaderProvider, mousePosProvider common.MousePosi
 	fileExt := strings.ToLower(path.Ext(filePath))
 
 	fileStream, err := loaderProvider.Load(filePath)
-	defer fileStream.Close()
+	defer func() { _ = fileStream.Close() }()
 
 	if err != nil {
 		return nil, err
-	}
-
-	_, ok := common.PaletteTexture[palette]
-	if !ok {
-		return nil, errors.New("sprite loaded with non-existent palette")
 	}
 
 	switch fileExt {
@@ -128,7 +122,7 @@ func New(loaderProvider common.LoaderProvider, mousePosProvider common.MousePosi
 		return nil, errors.New("unsupported file format")
 	}
 
-	result.textures = make([]rl.Texture2D, result.Sequences.FrameCount(result.CurrentSequence()))
+	result.textures = make([]renderprovider.Texture, result.Sequences.FrameCount(result.CurrentSequence()))
 	return result, nil
 }
 
@@ -142,11 +136,11 @@ func (s *Sprite) SetSequence(seqId int) {
 	}
 
 	for texIdx := range s.textures {
-		rl.UnloadTexture(s.textures[texIdx])
+		_ = s.renderProvider.FreeTexture(s.textures[texIdx])
 	}
 
 	s.currentSequence = seqId
-	s.textures = make([]rl.Texture2D, s.Sequences.FrameCount(s.CurrentSequence()))
+	s.textures = make([]renderprovider.Texture, s.Sequences.FrameCount(s.CurrentSequence()))
 }
 
 func (s *Sprite) setPalette(palette string) {
@@ -158,7 +152,7 @@ func (s *Sprite) Destroy() {
 	s.Active = false
 
 	for idx := range s.textures {
-		rl.UnloadTexture(s.textures[idx])
+		_ = s.renderProvider.FreeTexture(s.textures[idx])
 	}
 
 }

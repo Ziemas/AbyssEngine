@@ -3,12 +3,12 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"github.com/OpenDiablo2/AbyssEngine/providers/renderprovider/raylibrenderprovider"
 	"io/ioutil"
 	"os"
 	"path"
 
 	"github.com/OpenDiablo2/AbyssEngine/engine"
-	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/pkg/profile"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -41,11 +41,12 @@ func main() {
 		defer profile.Start(profile.ProfilePath(".")).Stop()
 	}
 
+	renderProvider := raylibrenderprovider.New()
+
 	log.Info().Msg("Abyss Engine")
 	log.Debug().Msgf("Runtime Path: %s", runPath)
 
-	rl.SetTraceLog(4)
-	rl.SetTraceLogCallback(func(logLevel int, s string) {
+	renderProvider.SetLoggerCallback(func(logLevel int, s string) {
 		[]func() *zerolog.Event{
 			log.Trace,
 			log.Debug,
@@ -55,6 +56,7 @@ func main() {
 			log.Fatal,
 		}[logLevel-1]().Msg(s)
 	})
+	renderProvider.SetLoggerLevel(0)
 
 	engineConfig := engine.Configuration{
 		RootPath: runPath,
@@ -67,7 +69,7 @@ func main() {
 		_ = jsonFile.Close()
 	}
 
-	coreEngine := engine.New(engineConfig)
+	coreEngine := engine.New(engineConfig, renderProvider)
 
 	coreEngine.Run()
 	coreEngine.Destroy()
