@@ -40,10 +40,10 @@ type Sprite struct {
 	bottomOrigin      bool
 	blendMode         renderprovider.BlendMode
 	paletteShift      int
-	onMouseButtonDown func()
-	onMouseButtonUp   func()
-	onMouseOver       func()
-	onMouseLeave      func()
+	OnMouseButtonDown func()
+	OnMouseButtonUp   func()
+	OnMouseOver       func()
+	OnMouseLeave      func()
 }
 
 func New(loaderProvider common.LoaderProvider, mousePosProvider common.MousePositionProvider,

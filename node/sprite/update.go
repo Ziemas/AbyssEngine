@@ -9,7 +9,7 @@ func (s *Sprite) update(elapsed float64) {
 		s.initializeTexture()
 	}
 
-	if s.onMouseButtonUp != nil || s.onMouseButtonDown != nil || s.onMouseOver != nil || s.onMouseLeave != nil {
+	if s.OnMouseButtonUp != nil || s.OnMouseButtonDown != nil || s.OnMouseOver != nil || s.OnMouseLeave != nil {
 		mx, my := s.mousePosProvider.GetMousePosition()
 		posX, posY := s.GetPosition()
 
@@ -21,8 +21,8 @@ func (s *Sprite) update(elapsed float64) {
 
 					s.isPressed = true
 
-					if s.onMouseButtonDown != nil {
-						s.onMouseButtonDown()
+					if s.OnMouseButtonDown != nil {
+						s.OnMouseButtonDown()
 					}
 				} else {
 					s.canPress = false
@@ -34,8 +34,8 @@ func (s *Sprite) update(elapsed float64) {
 				s.isPressed = false
 
 				if mouseIsOver {
-					if s.onMouseButtonUp != nil {
-						s.onMouseButtonUp()
+					if s.OnMouseButtonUp != nil {
+						s.OnMouseButtonUp()
 					}
 				}
 			}
@@ -44,13 +44,13 @@ func (s *Sprite) update(elapsed float64) {
 
 		if mouseIsOver && !s.isMouseOver {
 			s.isMouseOver = true
-			if s.onMouseOver != nil {
-				s.onMouseOver()
+			if s.OnMouseOver != nil {
+				s.OnMouseOver()
 			}
 		} else if !mouseIsOver && s.isMouseOver {
 			s.isMouseOver = false
-			if s.onMouseLeave != nil {
-				s.onMouseLeave()
+			if s.OnMouseLeave != nil {
+				s.OnMouseLeave()
 			}
 		}
 	}

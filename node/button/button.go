@@ -18,24 +18,28 @@ const (
 type Button struct {
 	*node.Node
 
-	buttonLayout buttonlayout.ButtonLayout
-	enabled      bool
-	pressed      bool
-	toggled      bool
-	onClick      func()
-	sprite       *sprite.Sprite
-	label        *label.Label
-	text         string
+	renderProvider renderprovider.RenderProvider
+	buttonLayout   buttonlayout.ButtonLayout
+	enabled        bool
+	pressed        bool
+	toggled        bool
+	labelOffset    bool
+	mouseOver      bool
+	onClick        func()
+	sprite         *sprite.Sprite
+	label          *label.Label
+	text           string
 }
 
 func New(loaderProvider common.LoaderProvider, renderProvider renderprovider.RenderProvider, mousePositionProvider common.MousePositionProvider,
 	buttonLayout buttonlayout.ButtonLayout) (*Button, error) {
 	result := &Button{
-		Node:         node.New(),
-		buttonLayout: buttonLayout,
-		enabled:      true,
-		pressed:      false,
-		toggled:      false,
+		Node:           node.New(),
+		buttonLayout:   buttonLayout,
+		renderProvider: renderProvider,
+		enabled:        true,
+		pressed:        false,
+		toggled:        false,
 	}
 
 	result.RenderCallback = result.render
@@ -86,6 +90,10 @@ func New(loaderProvider common.LoaderProvider, renderProvider renderprovider.Ren
 
 	result.sprite.CellSizeX = buttonLayout.XSegments
 	result.sprite.CellSizeY = buttonLayout.YSegments
+	result.sprite.OnMouseButtonDown = func() { result.onPressed() }
+	result.sprite.OnMouseButtonUp = func() { result.onReleased() }
+	result.sprite.OnMouseOver = func() { result.onHover() }
+	result.sprite.OnMouseLeave = func() { result.onLeave() }
 
 	err = result.AddChild(result.sprite.Node)
 
@@ -111,23 +119,6 @@ func (b *Button) render() {
 	}
 
 	if b.buttonLayout.HasImage {
-
-		if !b.enabled {
-			if b.toggled {
-				b.sprite.CurrentFrame = b.buttonLayout.BaseFrame + buttonStateToggled
-			} else {
-				b.sprite.CurrentFrame = b.buttonLayout.DisabledFrame
-			}
-		} else if b.toggled && b.pressed {
-			b.sprite.CurrentFrame = b.buttonLayout.BaseFrame + buttonStatePressedToggled
-		} else if b.pressed && b.buttonLayout.AllowFrameChange {
-			b.sprite.CurrentFrame = b.buttonLayout.BaseFrame + buttonStatePressed
-		} else if b.toggled {
-			b.sprite.CurrentFrame = b.buttonLayout.BaseFrame + buttonStateToggled
-		} else {
-			b.sprite.CurrentFrame = b.buttonLayout.BaseFrame
-		}
-
 		b.sprite.Render()
 	}
 }
@@ -137,5 +128,76 @@ func (b *Button) update(elapsed float64) {
 		return
 	}
 
+	if b.pressed && !b.mouseOver && !b.renderProvider.IsMouseButtonPressed(renderprovider.MouseButtonLeft) {
+		b.pressed = false
+	}
+
+	pressed := b.pressed && b.mouseOver
+
+	if b.buttonLayout.HasImage {
+		if !b.enabled {
+			if b.toggled {
+				b.sprite.CurrentFrame = b.buttonLayout.BaseFrame + buttonStateToggled
+			} else {
+				b.sprite.CurrentFrame = b.buttonLayout.DisabledFrame
+			}
+		} else if b.toggled && pressed {
+			b.sprite.CurrentFrame = b.buttonLayout.BaseFrame + (buttonStatePressedToggled * b.sprite.CellSizeX)
+		} else if pressed && b.buttonLayout.AllowFrameChange {
+			b.sprite.CurrentFrame = b.buttonLayout.BaseFrame + (buttonStatePressed * b.sprite.CellSizeX)
+		} else if b.toggled {
+			b.sprite.CurrentFrame = b.buttonLayout.BaseFrame + (buttonStateToggled * b.sprite.CellSizeX)
+		} else {
+			b.sprite.CurrentFrame = b.buttonLayout.BaseFrame
+		}
+
+		if b.labelOffset && !pressed {
+			b.label.X += 2
+			b.label.Y -= 2
+			b.labelOffset = false
+		} else if !b.labelOffset && pressed {
+			b.label.X -= 2
+			b.label.Y += 2
+			b.labelOffset = true
+		}
+	}
+
 	b.sprite.Update(elapsed)
+}
+
+func (b *Button) onPressed() {
+	if !b.enabled || !b.Active {
+		return
+	}
+
+	b.pressed = true
+}
+
+func (b *Button) onReleased() {
+	if !b.enabled || !b.Active {
+		return
+	}
+
+	if b.pressed {
+		b.pressed = false
+		if b.onClick != nil {
+			b.onClick()
+		}
+	}
+}
+
+func (b *Button) onHover() {
+	if !b.enabled || !b.Active {
+		return
+	}
+
+	b.mouseOver = true
+}
+
+func (b *Button) onLeave() {
+	if !b.enabled || !b.Active {
+		return
+	}
+
+	b.mouseOver = false
 }

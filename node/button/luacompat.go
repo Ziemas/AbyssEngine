@@ -2,7 +2,6 @@ package button
 
 import (
 	"fmt"
-
 	"github.com/OpenDiablo2/AbyssEngine/common"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -12,13 +11,47 @@ var LuaTypeExport = common.LuaTypeExport{
 	Name: luaTypeExportName,
 	//ConstructorFunc: newLuaEntity,
 	Methods: map[string]lua.LGFunction{
-		"node":     luaGetNode,
-		"active":   luaGetSetActive,
-		"enabled":  luaGetSetEnabled,
-		"pressed":  luaGetSetPressed,
-		"toggled":  luaGetSetToggled,
-		"position": luaGetSetPosition,
+		"node":            luaGetNode,
+		"active":          luaGetSetActive,
+		"enabled":         luaGetSetEnabled,
+		"pressed":         luaGetSetPressed,
+		"toggled":         luaGetSetToggled,
+		"position":        luaGetSetPosition,
+		"activateHandler": luaGetSetActivateHandler,
 	},
+}
+
+func luaGetSetActivateHandler(l *lua.LState) int {
+	button, err := FromLua(l.ToUserData(1))
+
+	if err != nil {
+		l.RaiseError("failed to convert")
+		return 0
+	}
+
+	if l.GetTop() == 1 {
+		l.Push(l.NewFunction(func(l *lua.LState) int {
+			button.onClick()
+			return 0
+		}))
+
+		return 1
+	}
+
+	luaFunc := l.CheckFunction(2)
+	button.onClick = func() {
+		go func() {
+			if err := l.CallByParam(lua.P{
+				Fn:      luaFunc,
+				NRet:    1,
+				Protect: true,
+			}, button.ToLua(l)); err != nil {
+				panic(err)
+			}
+		}()
+	}
+
+	return 0
 }
 
 func luaGetSetPosition(l *lua.LState) int {

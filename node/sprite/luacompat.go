@@ -140,7 +140,7 @@ func luaGetSetMouseOverHandler(l *lua.LState) int {
 
 	if l.GetTop() == 1 {
 		l.Push(l.NewFunction(func(l *lua.LState) int {
-			sprite.onMouseOver()
+			sprite.OnMouseOver()
 			return 0
 		}))
 
@@ -148,7 +148,7 @@ func luaGetSetMouseOverHandler(l *lua.LState) int {
 	}
 
 	luaFunc := l.CheckFunction(2)
-	sprite.onMouseOver = func() {
+	sprite.OnMouseOver = func() {
 		go func() {
 			if err := l.CallByParam(lua.P{
 				Fn:      luaFunc,
@@ -173,7 +173,7 @@ func luaGetSetMouseLeaveHandler(l *lua.LState) int {
 
 	if l.GetTop() == 1 {
 		l.Push(l.NewFunction(func(l *lua.LState) int {
-			sprite.onMouseLeave()
+			sprite.OnMouseLeave()
 			return 0
 		}))
 
@@ -181,7 +181,7 @@ func luaGetSetMouseLeaveHandler(l *lua.LState) int {
 	}
 
 	luaFunc := l.CheckFunction(2)
-	sprite.onMouseLeave = func() {
+	sprite.OnMouseLeave = func() {
 		go func() {
 			if err := l.CallByParam(lua.P{
 				Fn:      luaFunc,
@@ -219,7 +219,7 @@ func luaGetSetMouseButtonUpHandler(l *lua.LState) int {
 
 	if l.GetTop() == 1 {
 		l.Push(l.NewFunction(func(l *lua.LState) int {
-			sprite.onMouseButtonUp()
+			sprite.OnMouseButtonUp()
 			return 0
 		}))
 
@@ -227,7 +227,7 @@ func luaGetSetMouseButtonUpHandler(l *lua.LState) int {
 	}
 
 	luaFunc := l.CheckFunction(2)
-	sprite.onMouseButtonUp = func() {
+	sprite.OnMouseButtonUp = func() {
 		go func() {
 			if err := l.CallByParam(lua.P{
 				Fn:      luaFunc,
@@ -405,7 +405,7 @@ func luaGetSetMouseButtonDownHandler(l *lua.LState) int {
 
 	if l.GetTop() == 1 {
 		l.Push(l.NewFunction(func(l *lua.LState) int {
-			sprite.onMouseButtonDown()
+			sprite.OnMouseButtonDown()
 			return 0
 		}))
 
@@ -413,7 +413,7 @@ func luaGetSetMouseButtonDownHandler(l *lua.LState) int {
 	}
 
 	luaFunc := l.CheckFunction(2)
-	sprite.onMouseButtonDown = func() {
+	sprite.OnMouseButtonDown = func() {
 		go func() {
 			if err := l.CallByParam(lua.P{
 				Fn:      luaFunc,
