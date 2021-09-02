@@ -3,10 +3,12 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"github.com/OpenDiablo2/AbyssEngine/providers/renderprovider/raylibrenderprovider"
 	"io/ioutil"
 	"os"
 	"path"
+
+	"github.com/OpenDiablo2/AbyssEngine/providers/renderprovider/raylibrenderprovider"
+	zrenderprovider "github.com/OpenDiablo2/AbyssEngine/providers/renderprovider/zrenderer"
 
 	"github.com/OpenDiablo2/AbyssEngine/engine"
 	"github.com/pkg/profile"
@@ -41,7 +43,8 @@ func main() {
 		defer profile.Start(profile.ProfilePath(".")).Stop()
 	}
 
-	renderProvider := raylibrenderprovider.New()
+	//renderProvider := raylibrenderprovider.New()
+	renderProvider := zrenderprovider.New()
 
 	log.Info().Msg("Abyss Engine")
 	log.Debug().Msgf("Runtime Path: %s", runPath)

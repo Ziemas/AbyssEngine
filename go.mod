@@ -23,4 +23,7 @@ require (
 
 require github.com/OpenDiablo2/pl2 v0.0.0-20210829065851-466620ae9e98
 
-require github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
+require (
+	github.com/go-gl/gl v0.0.0-20210813123233-e4099ee2221f
+	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
+)
