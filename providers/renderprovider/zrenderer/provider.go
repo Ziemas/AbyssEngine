@@ -17,6 +17,14 @@ var ImageColorModeLookup = map[rp.ImageColorMode]PixelFormat{
 	rp.ImageColorModeGrayscale:         PixelFmtGrayscale,
 }
 
+var BlendModeLookup = map[rp.BlendMode]BlendMode{
+	rp.BlendModeAlpha:          BlendModeAlpha,
+	rp.BlendModeAdditive:       BlendModeAdditive,
+	rp.BlendModeMultiplied:     BlendModeMultiplied,
+	rp.BlendModeAddColors:      BlendModeAddColors,
+	rp.BlendModeSubtractColors: BlendModeSubtractColors,
+}
+
 type ZRenderProvider struct {
 	wflags rp.WindowFlag
 	window *glfw.Window
@@ -145,9 +153,11 @@ func (z *ZRenderProvider) NewImage(reader io.Reader, width, height int, imageCol
 }
 
 func (z *ZRenderProvider) BeginBlendMode(blendMode rp.BlendMode) {
+	SetBlendMode(BlendModeLookup[blendMode])
 }
 
 func (z *ZRenderProvider) EndBlendMode() {
+	SetBlendMode(BlendModeNone)
 }
 
 func (z *ZRenderProvider) LoadPalette(name string, paletteStream io.Reader) error {

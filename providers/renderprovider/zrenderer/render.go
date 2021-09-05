@@ -10,13 +10,36 @@ import (
 	mgl "github.com/go-gl/mathgl/mgl32"
 )
 
+func init() {
+	runtime.LockOSThread()
+}
+
 const (
 	TexUnitImage int = iota
 	TexUnitPalette
 )
 
-func init() {
-	runtime.LockOSThread()
+type BlendMode int
+const (
+	BlendModeNone BlendMode = iota
+	BlendModeAlpha
+	BlendModeAdditive
+	BlendModeMultiplied
+	BlendModeAddColors
+	BlendModeSubtractColors
+)
+
+func SetBlendMode(mode BlendMode) {
+	switch mode {
+	case BlendModeNone:
+		gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+	case BlendModeAdditive:
+		gl.BlendFunc(gl.ONE, gl.ONE)
+	case BlendModeMultiplied:
+		gl.BlendFunc(gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA)
+	default:
+		gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+	}
 }
 
 var (
