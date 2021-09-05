@@ -9,10 +9,10 @@ import (
 )
 
 //go:embed shaders/fragment.glsl
-var PaletteFragmentShader string
+var paletteFragmentShader string
 
 //go:embed shaders/vertex.glsl
-var StandardVertexShader string
+var standardVertexShader string
 
 type Shader struct {
 	id uint32
@@ -22,7 +22,7 @@ type Shader struct {
 }
 
 func InitShaders() Shader {
-	shader := NewProgram(StandardVertexShader, PaletteFragmentShader)
+	shader := NewProgram(standardVertexShader, paletteFragmentShader)
 
 	shader.UniformModel = GetShaderLocation(shader, "model")
 	shader.UniformProjection = GetShaderLocation(shader, "projection")

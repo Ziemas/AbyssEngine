@@ -8,12 +8,12 @@ uniform int paletteOffset;
 uniform bool usePalette;
 
 void main() {
-    if (usePalette == false) {
-        color = texture(image, TexCoords);
-    } else {
+    if (usePalette) {
         float palYCoord = float(paletteOffset) / float(textureSize(paletteTex, 0).y - 1);
         vec4 index = texture(image, TexCoords);
         color = texture(paletteTex, vec2(index.x, palYCoord));
+    } else {
+        color = texture(image, TexCoords);
     }
 }
 

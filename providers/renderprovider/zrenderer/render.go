@@ -107,28 +107,7 @@ func (r *Renderer) Clear() {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 }
 
-func (r *Renderer) DrawTextureEX(tex *zTexture, srcRect, destRect image.Rectangle, palette string, paletteOffset int) error {
-	// TODO source
-	model := mgl.Ident4().
-		Mul4(mgl.Translate3D(float32(destRect.Min.X), float32(destRect.Min.Y), 0)).
-		Mul4(mgl.Scale3D(float32(destRect.Dx()), float32(destRect.Dy()), 0.0))
-
-	gl.UniformMatrix4fv(int32(r.shader.UniformModel), 1, false, &model[0])
-
-	gl.ActiveTexture(gl.TEXTURE0 + uint32(TexUnitImage))
-	tex.Bind()
-	gl.BindVertexArray(r.fanVAO)
-	gl.DrawArrays(gl.TRIANGLE_FAN, 0, 4)
-	gl.BindTexture(gl.TEXTURE_2D, 0)
-
-	return nil
-}
-
-func (r *Renderer) DrawTexture(tex *zTexture, x, y int, palette string, paletteOffset int) error {
-	model := mgl.Ident4().
-		Mul4(mgl.Translate3D(float32(x), float32(y), 0)).
-		Mul4(mgl.Scale3D(float32(tex.Width()), float32(tex.Height()), 0.0))
-
+func (r *Renderer) setupPalette(palette string, paletteOffset int) error {
 	if palette != "" {
 		pal := r.palette[palette]
 		if !pal.Init {
@@ -149,6 +128,20 @@ func (r *Renderer) DrawTexture(tex *zTexture, x, y int, palette string, paletteO
 		gl.Uniform1i(r.shader.UniformUsePalette, 0)
 	}
 
+	return nil
+}
+
+func (r *Renderer) DrawTextureEX(tex *zTexture, srcRect, destRect image.Rectangle, palette string, paletteOffset int) error {
+	// TODO source
+	model := mgl.Ident4().
+		Mul4(mgl.Translate3D(float32(destRect.Min.X), float32(destRect.Min.Y), 0)).
+		Mul4(mgl.Scale3D(float32(destRect.Dx()), float32(destRect.Dy()), 0.0))
+
+	err := r.setupPalette(palette, paletteOffset)
+	if err != nil {
+		return err
+	}
+
 	gl.UniformMatrix4fv(int32(r.shader.UniformModel), 1, false, &model[0])
 
 	gl.ActiveTexture(gl.TEXTURE0 + uint32(TexUnitImage))
@@ -156,7 +149,26 @@ func (r *Renderer) DrawTexture(tex *zTexture, x, y int, palette string, paletteO
 	gl.BindVertexArray(r.fanVAO)
 	gl.DrawArrays(gl.TRIANGLE_FAN, 0, 4)
 	gl.BindTexture(gl.TEXTURE_2D, 0)
-	gl.Uniform1i(r.shader.UniformUsePalette, 0)
+
+	return nil
+}
+
+func (r *Renderer) DrawTexture(tex *zTexture, x, y int, palette string, paletteOffset int) error {
+	model := mgl.Ident4().
+		Mul4(mgl.Translate3D(float32(x), float32(y), 0)).
+		Mul4(mgl.Scale3D(float32(tex.Width()), float32(tex.Height()), 0.0))
+	err := r.setupPalette(palette, paletteOffset)
+	if err != nil {
+		return err
+	}
+
+	gl.UniformMatrix4fv(int32(r.shader.UniformModel), 1, false, &model[0])
+
+	gl.ActiveTexture(gl.TEXTURE0 + uint32(TexUnitImage))
+	tex.Bind()
+	gl.BindVertexArray(r.fanVAO)
+	gl.DrawArrays(gl.TRIANGLE_FAN, 0, 4)
+	gl.BindTexture(gl.TEXTURE_2D, 0)
 
 	return nil
 }
