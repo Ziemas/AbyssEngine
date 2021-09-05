@@ -128,6 +128,7 @@ func (z *ZRenderProvider) DrawTextureEx(texture rp.Texture, srcRect, destRec ima
 }
 
 func (z *ZRenderProvider) DrawFontTexture(texture rp.Texture, x, y int, palette string, color int) error {
+	z.renderer.DrawTexture(texture.(*zTexture), x, y, palette, PaletteTextShiftOffset+color)
 	return nil
 }
 
@@ -150,6 +151,13 @@ func (z *ZRenderProvider) EndBlendMode() {
 }
 
 func (z *ZRenderProvider) LoadPalette(name string, paletteStream io.Reader) error {
+	pal, err := NewPalette(paletteStream)
+	if err != nil {
+		return err
+	}
+
+	z.renderer.LoadPalette(name, pal)
+
 	return nil
 }
 

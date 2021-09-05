@@ -11,8 +11,9 @@ void main() {
     if (usePalette == false) {
         color = texture(image, TexCoords);
     } else {
-        float palYCoord = paletteOffset / (textureSize(paletteTex, 0).y - 1);
+        float palYCoord = float(paletteOffset) / float(textureSize(paletteTex, 0).y - 1);
         vec4 index = texture(image, TexCoords);
         color = texture(paletteTex, vec2(index.x, palYCoord));
     }
 }
+

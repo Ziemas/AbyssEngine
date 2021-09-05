@@ -39,12 +39,12 @@ type Renderer struct {
 	fanVAO   uint32
 	shader   Shader
 	fbo      uint32
-	palette  map[string]zTexture
+	palette  map[string]*Palette
 }
 
 func NewRenderer() *Renderer {
 	ren := Renderer{
-		palette:  make(map[string]zTexture),
+		palette:  make(map[string]*Palette),
 	}
 
 	err := gl.Init()
@@ -83,6 +83,10 @@ func (r *Renderer) InitUniforms() {
 	gl.Uniform1i(sh.UniformPaletteTex, int32(TexUnitImage))
 	gl.Uniform1i(sh.UniformPaletteOffset, 0)
 	gl.Uniform1i(sh.UniformUsePalette, 0)
+}
+
+func (r *Renderer) LoadPalette(name string, pal *Palette) {
+	r.palette[name] = pal
 }
 
 func (r *Renderer) BindRenderTexture(tex *zTexture) {
@@ -125,6 +129,26 @@ func (r *Renderer) DrawTexture(tex *zTexture, x, y int, palette string, paletteO
 		Mul4(mgl.Translate3D(float32(x), float32(y), 0)).
 		Mul4(mgl.Scale3D(float32(tex.Width()), float32(tex.Height()), 0.0))
 
+	if palette != "" {
+		pal := r.palette[palette]
+		if !pal.Init {
+			paltex, err := NewTexture(gl.Ptr(pal.Data), 256, PaletteTransformsCount, PixelFmtRGBA8)
+			if err != nil {
+				return err
+			}
+			pal.Texture = paltex
+			pal.Init = true
+		}
+
+		gl.Uniform1i(r.shader.UniformUsePalette, 1)
+		gl.Uniform1i(r.shader.UniformPaletteTex, int32(TexUnitPalette))
+		gl.Uniform1i(r.shader.UniformPaletteOffset, int32(paletteOffset))
+		gl.ActiveTexture(gl.TEXTURE0 + uint32(TexUnitPalette))
+		pal.Texture.Bind()
+	} else {
+		gl.Uniform1i(r.shader.UniformUsePalette, 0)
+	}
+
 	gl.UniformMatrix4fv(int32(r.shader.UniformModel), 1, false, &model[0])
 
 	gl.ActiveTexture(gl.TEXTURE0 + uint32(TexUnitImage))
@@ -132,6 +156,7 @@ func (r *Renderer) DrawTexture(tex *zTexture, x, y int, palette string, paletteO
 	gl.BindVertexArray(r.fanVAO)
 	gl.DrawArrays(gl.TRIANGLE_FAN, 0, 4)
 	gl.BindTexture(gl.TEXTURE_2D, 0)
+	gl.Uniform1i(r.shader.UniformUsePalette, 0)
 
 	return nil
 }
