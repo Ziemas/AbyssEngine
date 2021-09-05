@@ -25,5 +25,9 @@ require github.com/OpenDiablo2/pl2 v0.0.0-20210829065851-466620ae9e98
 
 require (
 	github.com/go-gl/gl v0.0.0-20210813123233-e4099ee2221f
+	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20210727001814-0db043d8d5be
+	github.com/go-gl/mathgl v1.0.0
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 )
+
+require golang.org/x/image v0.0.0-20200927104501-e162460cd6b5 // indirect

@@ -7,7 +7,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/OpenDiablo2/AbyssEngine/providers/renderprovider/raylibrenderprovider"
 	zrenderprovider "github.com/OpenDiablo2/AbyssEngine/providers/renderprovider/zrenderer"
 
 	"github.com/OpenDiablo2/AbyssEngine/engine"
