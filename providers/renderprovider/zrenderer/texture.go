@@ -25,6 +25,15 @@ func textureFormat(fmt PixelFormat) (glInternalFmt int, glFormat int, glType int
 	return 0, 0, 0, errors.New("Unsupported pixel format")
 }
 
+func textureSwizzle(fmt PixelFormat) []int32 {
+	switch fmt {
+	case PixelFmtGrayscale:
+		return []int32{gl.RED, gl.RED, gl.RED, gl.ONE}
+	default:
+		return []int32{gl.RED, gl.GREEN, gl.BLUE, gl.ALPHA}
+	}
+}
+
 func NewTexture(pixels unsafe.Pointer, width, height int, format PixelFormat) (*zTexture, error) {
 	glifmt, glfmt, gltype, err := textureFormat(format)
 
@@ -49,6 +58,9 @@ func NewTexture(pixels unsafe.Pointer, width, height int, format PixelFormat) (*
 		uint32(glfmt),
 		uint32(gltype),
 		pixels)
+
+	swizzle := textureSwizzle(format)
+	gl.TexParameteriv(gl.TEXTURE_2D, gl.TEXTURE_SWIZZLE_RGBA, &swizzle[0])
 
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
