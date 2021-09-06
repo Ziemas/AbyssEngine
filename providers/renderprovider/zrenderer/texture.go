@@ -45,7 +45,6 @@ func NewTexture(pixels unsafe.Pointer, width, height int, format PixelFormat) (*
 
 	var texture uint32
 	gl.GenTextures(1, &texture)
-	println(texture)
 	gl.ActiveTexture(gl.TEXTURE0)
 	gl.BindTexture(gl.TEXTURE_2D, texture)
 
