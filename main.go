@@ -18,11 +18,12 @@ import (
 
 var runPath string
 var doProfile bool
+var doMemProfile bool
 
 func initFlags() {
 	flag.StringVar(&runPath, "path", "", "path to the engine runtime files")
 	flag.BoolVar(&doProfile, "profile", false, "profile the engine")
-	flag.BoolVar(&doProfile, "memprofile", false, "profile the engine (memory allocations)")
+	flag.BoolVar(&doMemProfile, "memprofile", false, "profile the engine (memory allocations)")
 	flag.Parse()
 
 	if runPath == "" {
@@ -41,6 +42,10 @@ func main() {
 
 	if doProfile {
 		defer profile.Start(profile.ProfilePath(".")).Stop()
+	}
+
+	if doMemProfile {
+		defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
 	}
 
 	//renderProvider := raylibrenderprovider.New()
