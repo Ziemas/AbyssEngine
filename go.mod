@@ -30,4 +30,9 @@ require (
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 )
 
-require golang.org/x/image v0.0.0-20200927104501-e162460cd6b5 // indirect
+require (
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
+	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d // indirect
+)
+
+require golang.org/x/text v0.3.6 // indirect

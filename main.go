@@ -22,6 +22,7 @@ var doProfile bool
 func initFlags() {
 	flag.StringVar(&runPath, "path", "", "path to the engine runtime files")
 	flag.BoolVar(&doProfile, "profile", false, "profile the engine")
+	flag.BoolVar(&doProfile, "memprofile", false, "profile the engine (memory allocations)")
 	flag.Parse()
 
 	if runPath == "" {

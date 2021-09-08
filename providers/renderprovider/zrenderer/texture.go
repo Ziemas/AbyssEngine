@@ -7,12 +7,11 @@ import (
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
-type zTexture struct {
-	id            uint32
-	format        PixelFormat
-	width, height int
-	fbo           uint32
-}
+type PixelFormat int
+const (
+	PixelFmtRGBA8 PixelFormat = iota
+	PixelFmtGrayscale
+)
 
 // Map our pixel formats to their GL texture settings
 func textureFormat(fmt PixelFormat) (glInternalFmt int, glFormat int, glType int, err error) {
@@ -34,6 +33,13 @@ func textureSwizzle(fmt PixelFormat) (bool, []int32) {
 	default:
 		return false, []int32{}
 	}
+}
+
+type zTexture struct {
+	id            uint32
+	format        PixelFormat
+	width, height int
+	fbo           uint32
 }
 
 func NewTexture(pixels unsafe.Pointer, width, height int, format PixelFormat) (*zTexture, error) {

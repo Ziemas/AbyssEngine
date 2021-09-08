@@ -75,7 +75,11 @@ func NewProgram(vertexShaderSrc, fragmentShaderSrc string) Shader {
 func compileShader(source string, sType uint32) uint32 {
 	shader := gl.CreateShader(sType)
 
-	csource, free := gl.Strs(source)
+	// Seems like it's really buggy on non-null terminated strings
+	// intermittently leaving garbage at the end making the shader compiler error out
+	tmp := source + "\000"
+
+	csource, free := gl.Strs(tmp)
 	gl.ShaderSource(shader, 1, csource, nil)
 	free()
 	gl.CompileShader(shader)
@@ -90,6 +94,8 @@ func compileShader(source string, sType uint32) uint32 {
 		gl.GetShaderInfoLog(shader, logLength, nil, gl.Str(msg))
 
 		debugPrint(5, fmt.Sprintf("Failed to compile shader %s", msg))
+		println(source)
+		println(*csource)
 
 		return 0
 	}

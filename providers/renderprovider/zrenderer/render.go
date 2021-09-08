@@ -20,6 +20,7 @@ const (
 )
 
 type BlendMode int
+
 const (
 	BlendModeNone BlendMode = iota
 	BlendModeAlpha
@@ -43,6 +44,7 @@ func SetBlendMode(mode BlendMode) {
 }
 
 var (
+	// vec2 pos, vec2, texcoords
 	verts = []float32{
 		0.0, 1.0, 0.0, 1.0,
 		1.0, 1.0, 1.0, 1.0,
@@ -67,7 +69,7 @@ type Renderer struct {
 
 func NewRenderer() *Renderer {
 	ren := Renderer{
-		palette:  make(map[string]*Palette),
+		palette: make(map[string]*Palette),
 	}
 
 	err := gl.Init()

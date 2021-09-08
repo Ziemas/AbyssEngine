@@ -192,7 +192,12 @@ func (z *ZRenderProvider) IsRunning() bool {
 }
 
 func (z *ZRenderProvider) LoadFontTTF(stream io.Reader, fontSize int) (rp.Font, error) {
-	return nil, nil
+	buf, err := ioutil.ReadAll(stream)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewFont(buf, fontSize)
 }
 
 func (z *ZRenderProvider) FreeFont(font rp.Font) error {
@@ -200,6 +205,7 @@ func (z *ZRenderProvider) FreeFont(font rp.Font) error {
 }
 
 func (z *ZRenderProvider) DrawText(font rp.Font, x, y int, color color.Color, text string) error {
+	font.(*zFont).RenderString(x, y, text, z.renderer)
 	return nil
 }
 

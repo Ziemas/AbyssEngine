@@ -2,7 +2,7 @@ package media
 
 import _ "embed"
 
-//go:embed fonts/diablo_h.ttf
+//go:embed fonts/diablo_h.otf
 var FontDiabloHeavy []byte
 
 //go:embed images/bootlogo.png

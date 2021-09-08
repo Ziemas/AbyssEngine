@@ -1,11 +1,5 @@
 package zrenderprovider
 
-type PixelFormat int
-const (
-	PixelFmtRGBA8 PixelFormat = iota
-	PixelFmtGrayscale
-)
-
 type RGBA8 struct {
 	r, g, b, a uint8
 }
